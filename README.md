@@ -30,3 +30,10 @@ This is **purely theoretical**—no experimental claims. Numerical GR simulation
    cd simulations/
    pip install -r requirements.txt  # SymPy, NumPy, Matplotlib
    python placeholder_gravity_sim.py  # Stub for ergosphere pumping
+Mathematical Overview
+The Kerr metric  in Boyer-Lindquist coordinates ((t, r, \theta, \phi)) is:
+[
+ds^2 = -\left(1 - \frac{2Mr}{\Sigma}\right) dt^2 + \frac{\Sigma}{\Delta} dr^2 + \Sigma d\theta^2 + \left(r^2 + \alpha^2 + \frac{2Mr \alpha^2}{\Sigma} \sin^2\theta\right) \sin^2\theta d\phi^2 - \frac{4Mar \sin^2\theta}{\Sigma} dt d\phi
+]
+where (\Sigma = r^2 + \alpha^2 \cos^2\theta), (\Delta = r^2 - 2Mr + \alpha^2), (\alpha = J/M).
+Bollinger fields introduce a perturbation (T_{\mu\nu} \to T_{\mu\nu} + h_{\mu\nu}(\phi)), resonating at (\omega \approx \Omega_H) (horizon angular velocity) to amplify (g_{t\phi}) .
