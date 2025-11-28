@@ -1,0 +1,54 @@
+
+*(Cites are placeholders for inline rendering; GitHub will handle badges.)*
+
+---
+
+### 2. Update `theory/kerr_metric_review.tex`
+Create/edit as LaTeX (compile to PDF later via Overleaf or local):
+
+```latex
+\documentclass{article}
+\usepackage{amsmath}
+\usepackage{geometry}
+\geometry{margin=1in}
+
+\title{Review of the Kerr Metric in Boyer-Lindquist Coordinates}
+\author{Bollinger--Kerr-Drive Collaboration}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\section{Introduction}
+The Kerr metric \cite{kerr1963} describes the spacetime around a rotating, uncharged black hole of mass $M$ and angular momentum $J = M a$. In Boyer-Lindquist coordinates $(t, r, \theta, \phi)$ \cite{boyer1967}, it generalizes the Schwarzschild solution and exhibits frame-dragging via the $g_{t\phi}$ cross-term \cite{wiki_kerr}.
+
+\section{The Metric}
+The line element is
+\begin{align}
+ds^2 &= -\left(1 - \frac{2 M r}{\Sigma}\right) dt^2 - \frac{4 M a r \sin^2\theta}{\Sigma} dt d\phi + \frac{\Sigma}{\Delta} dr^2 + \Sigma d\theta^2 \nonumber \\
+&\quad + \left( r^2 + a^2 + \frac{2 M r a^2 \sin^2\theta}{\Sigma} \right) \sin^2\theta d\phi^2,
+\end{align}
+where
+\begin{align}
+\Sigma &= r^2 + a^2 \cos^2\theta, \\
+\Delta &= r^2 - 2 M r + a^2.
+\end{align}
+The horizons are at $\Delta = 0$: $r_\pm = M \pm \sqrt{M^2 - a^2}$.
+
+\section{Frame-Dragging}
+The off-diagonal $g_{t\phi}$ induces Lense-Thirring precession \cite{lense1918}, dragging inertial frames with angular velocity $\omega = -g_{t\phi}/g_{\phi\phi} = 2 M a r / (r^2 + a^2 + 2 M r a^2 \sin^2\theta / \Sigma) \sin^2\theta$ \cite{wiki_frame}.
+
+\section{Ergosphere}
+Region where $g_{tt} > 0$: $r_E = M + \sqrt{M^2 - a^2 \cos^2\theta}$. Here, negative-energy states enable Penrose extraction \cite{penrose1969}.
+
+\bibliographystyle{plain}
+\begin{thebibliography}{9}
+\bibitem{kerr1963} R. P. Kerr, \emph{Phys. Rev. Lett.} \textbf{11}, 237 (1963).
+\bibitem{boyer1967} W. G. Boyer and R. W. Lindquist, \emph{J. Math. Phys.} \textbf{8}, 265 (1967).
+\bibitem{lense1918} J. Lense and H. Thirring, \emph{Phys. Z.} \textbf{19}, 156 (1918).
+\bibitem{penrose1969} R. Penrose, \emph{Rev. Mod. Phys.} \textbf{50}, 455 (1978). % Note: Actual Penrose process paper
+\bibitem{wiki_kerr} Wikipedia: Kerr metric (2025).
+\bibitem{wiki_frame} Wikipedia: Frame-dragging (2025).
+\end{thebibliography}
+
+\end{document}

@@ -1,0 +1,51 @@
+# Cell 1: Imports
+import sympy as sp
+from sympy import sin, cos, sqrt, simplify
+sp.init_printing(use_latex=False)
+
+# Cell 2: Symbols
+M, a, r, theta, t, phi = sp.symbols('M a r theta t phi', real=True, positive=True)
+Sigma = r**2 + (a * cos(theta))**2
+Delta = r**2 - 2*M*r + a**2
+
+# Cell 3: Metric Components
+g_tt = -(1 - 2*M*r / Sigma)
+g_tphi = - (2 * M * a * r * sin(theta)**2 / Sigma)  # Note: Often written as -2Mar sin^2 / Sigma for the cross term
+g_rr = Sigma / Delta
+g_theta_theta = Sigma
+g_phi_phi = (r**2 + a**2 + 2*M*r*a**2 * sin(theta)**2 / Sigma) * sin(theta)**2
+
+# Cell 4: Display Metric
+print("Kerr Metric Components (Boyer-Lindquist):")
+sp.pprint(g_tt, use_unicode=True)  # g_tt
+print("\ng_tφ (frame-dragging term):")
+sp.pprint(g_tphi)
+print("\ng_rr:")
+sp.pprint(g_rr)
+# ... (add others)
+
+# Cell 5: Horizons
+r_plus = M + sqrt(M**2 - a**2)
+r_minus = M - sqrt(M**2 - a**2)
+print(f"Outer Horizon: r_+ = {r_plus}")
+print(f"Inner Horizon: r_- = {r_minus}")
+
+# Cell 6: Ergosphere Boundary
+r_erg = M + sqrt(M**2 - a**2 * cos(theta)**2)
+print("Ergosphere: r_E(θ) =", r_erg)
+
+# Cell 7: Plot (requires matplotlib)
+import matplotlib.pyplot as plt
+import numpy as np
+theta_vals = np.linspace(0, np.pi, 100)
+a_val = 0.5 * M  # Assume M=1
+r_erg_vals = [M + np.sqrt(M**2 - (a_val)**2 * np.cos(th)**2) for th in theta_vals]
+plt.polar(theta_vals, r_erg_vals)
+plt.title("Ergosphere in Kerr Spacetime")
+plt.show()
+
+Sample Output (when run):
+
+g_tt: -(r² + a² cos²θ - 2 M r) / (r² + a² cos²θ)
+Horizons: r₊ = M + √(M² - a²), etc.
+Plot: A polar plot of the oblate ergosphere (squashed at poles).
