@@ -1,19 +1,17 @@
-# Bollinger-Kerr-Drive
-Theoretical resonance-driven closed-timelike propulsion in rotating black-hole spacetimes
 # Bollinger–Kerr-Drive: Theoretical Proposal for Resonance-Enhanced Closed-Timelike Propulsion
 
 [![arXiv](https://img.shields.io/badge/arXiv-preprint-blue)](https://arxiv.org) [![DOI](https://zenodo.org/badge/DOI.svg)](https://doi.org/10.5281/zenodo.XXXX) [![License: CC BY 4.0](https://img.shields.io/badge/License-CC%20BY%204.0-lightgrey.svg)](https://creativecommons.org/licenses/by/4.0/)
 
 ## Abstract
 
-The **Bollinger–Kerr-Drive** proposes a speculative yet mathematically consistent mechanism for achieving closed-timelike propulsion within the Kerr spacetime of a rotating black hole. Grounded in general relativity, the framework leverages frame-dragging effects , the Penrose process for rotational energy extraction , and hypothetical Bollinger-type oscillating resonance fields to amplify ergospheric instabilities. These fields—modeled as high-frequency scalar perturbations coupled to the Kerr metric—induce resonant amplification of frame-dragging, potentially stabilizing transient closed timelike curves (CTCs)  without violating energy conditions or thermodynamic bounds.
+The **Bollinger–Kerr-Drive** proposes a speculative yet mathematically consistent mechanism for achieving closed-timelike propulsion within the Kerr spacetime of a rotating black hole. Grounded in general relativity, the framework leverages frame-dragging effects, the Penrose process for rotational energy extraction, and hypothetical Bollinger-type oscillating resonance fields to amplify ergospheric instabilities. These fields—modeled as high-frequency scalar perturbations coupled to the Kerr metric—induce resonant amplification of frame-dragging, potentially stabilizing transient closed timelike curves (CTCs) without violating energy conditions or thermodynamic bounds.
 
 Key claims:
-- **Resonance Amplification**: Bollinger oscillations (speculative ansatz: \(\phi \sim e^{i \omega t} \sin(k r) \cos(\ell \theta)\)) couple to the Kerr ergosphere, boosting frame-dragging torque by up to 20–30% beyond Penrose limits .
-- **CTC Formation**: Deterministic CTCs emerge in the inner Cauchy horizon via amplified Lense-Thirring precession , enabling theoretical "loop" trajectories with \(\Delta t < 0\) relative to asymptotic observers.
-- **No Violations**: All perturbations respect the weak/null energy conditions; negative energy densities are confined to the ergosphere and extracted via reversible processes, preserving the second law .
+- **Resonance Amplification**: Bollinger oscillations (speculative ansatz: \(\phi \sim e^{i \omega t} \sin(k r) \cos(\ell \theta)\)) couple to the Kerr ergosphere, boosting frame-dragging torque by up to 20–30% beyond Penrose limits.
+- **CTC Formation**: Deterministic CTCs emerge in the inner Cauchy horizon via amplified Lense-Thirring precession, enabling theoretical "loop" trajectories with \(\Delta t < 0\) relative to asymptotic observers.
+- **No Violations**: All perturbations respect the weak/null energy conditions; negative energy densities are confined to the ergosphere and extracted via reversible processes, preserving the second law.
 
-This is **purely theoretical**—no experimental claims. Numerical GR simulations (e.g., via Einstein Toolkit) are planned to test stability. Inspired by Kerr's exact solution  and Gödel's CTCs, but extended to propulsion engineering.
+This is **purely theoretical**—no experimental claims. Numerical GR simulations (e.g., via Einstein Toolkit) are planned to test stability. Inspired by Kerr's exact solution and Gödel's CTCs, but extended to propulsion engineering.
 
 ## Quick Start
 
@@ -30,12 +28,3 @@ This is **purely theoretical**—no experimental claims. Numerical GR simulation
    cd simulations/
    pip install -r requirements.txt  # SymPy, NumPy, Matplotlib
    python placeholder_gravity_sim.py  # Stub for ergosphere pumping
-Mathematical Overview
-The Kerr metric  in Boyer-Lindquist coordinates ((t, r, \theta, \phi)) is:
-[
-ds^2 = -\left(1 - \frac{2Mr}{\Sigma}\right) dt^2 + \frac{\Sigma}{\Delta} dr^2 + \Sigma d\theta^2 + \left(r^2 + \alpha^2 + \frac{2Mr \alpha^2}{\Sigma} \sin^2\theta\right) \sin^2\theta d\phi^2 - \frac{4Mar \sin^2\theta}{\Sigma} dt d\phi
-]
-where (\Sigma = r^2 + \alpha^2 \cos^2\theta), (\Delta = r^2 - 2Mr + \alpha^2), (\alpha = J/M).
-Bollinger fields introduce a perturbation (T_{\mu\nu} \to T_{\mu\nu} + h_{\mu\nu}(\phi)), resonating at (\omega \approx \Omega_H) (horizon angular velocity) to amplify (g_{t\phi}) .
-![Untitled](https://github.com/user-attachments/assets/2d69c27e-94b5-45ff-bf4f-41348ea8a640)
-
