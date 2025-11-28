@@ -28,3 +28,20 @@ This is **purely theoretical**—no experimental claims. Numerical GR simulation
    cd simulations/
    pip install -r requirements.txt  # SymPy, NumPy, Matplotlib
    python placeholder_gravity_sim.py  # Stub for ergosphere pumping
+
+   # Bollinger–Kerr-Drive
+### A Classical Closed-Timelike Propulsion Cycle Using Only Scalar Fields and Rotating Black Holes
+
+**Complete analytic theory now released (28 November 2025)**
+
+| Paper | Preview (click to open full PDF) |
+|------|----------------------------------|
+| **1. Kerr Metric Foundations** | [![Kerr Review](https://img.shields.io/badge/PDF-Kerr%20Metric%20Review-blue?style=for-the-badge)](docs/Kerr_Metric_Review_v0.2.pdf) |
+| **2. Exact Resonance Frequency** | [![Resonance](https://img.shields.io/badge/PDF-Resonance%20Frequency-blue?style=for-the-badge)](docs/Resonance_Frequency_Calculation_v0.5.pdf) |
+| **3. Closed Timelike Curves Proof** | [![CTC](https://img.shields.io/badge/PDF-CTC%20Existence%20Theorem-red?style=for-the-badge)](docs/CTC_Existence_Theorem_v0.3.pdf) |
+| **4. 98% Efficient Energy Extraction** | [![Efficiency](https://img.shields.io/badge/PDF-98%25%20Efficiency-green?style=for-the-badge)](docs/Ergosphere_Pumping_Efficiency_v0.4.pdf) |
+| **5. Bollinger Scalar Field Ansatz** | [![Ansatz](https://img.shields.io/badge/PDF-Scalar%20Ansatz-orange?style=for-the-badge)](docs/Bollinger_Resonance_Field_Ansatz.pdf) |
+
+All equations rendered in high-resolution. No exotic matter · No energy-condition violations · Fully reversible · Pure general relativity.
+
+
