@@ -1,0 +1,31 @@
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Toy evolution of superradiant scalar cloud amplitude
+M = 1.0
+a = 0.998
+m = 1
+r_plus = M + np.sqrt(M**2 - a**2)
+Omega_H = a / (2 * M * r_plus)
+delta = 1.3e-6                     # detuning — controls growth rate γ ≈ delta
+gamma = delta                      # linear growth rate in geometric units
+
+t = np.logspace(2, 7, 400)         # 10²–10⁷ M
+Gamma = np.exp(gamma * t)          # exponential growth
+Gamma = np.minimum(Gamma, 5000)    # crude nonlinear saturation cap
+
+plt.figure(figsize=(8,5))
+plt.semilogx(t/M, Gamma, 'crimson', lw=2.5)
+plt.axhline(1.05, color='black', ls='--', label=r'$\Gamma_{crit}$ (low end)')
+plt.axhline(1.18, color='gray', ls='--')
+plt.axvline(1.1e5, color='goldenrod', ls=':', label='Γ=1.15 @ 9 min (10 M⊙)')
+plt.yscale('log')
+plt.ylim(0.9, 6000)
+plt.xlabel('Time [M]  (≈ 0.05 s per 1000 M for 10 M⊙ BH)', fontsize=12)
+plt.ylabel('Frame-dragging amplification Γ(t)', fontsize=12)
+plt.title('Toy Bollinger Cloud Evolution — Exponential → Saturation', fontsize=14)
+plt.legend()
+plt.grid(alpha=0.3)
+plt.tight_layout()
+plt.savefig('assets/cloud_evolution.png', dpi=300)
+plt.show()
