@@ -35,20 +35,4 @@ This is **purely theoretical**—no experimental claims. Numerical GR simulation
 
 All equations high-resolution rendered. No exotic matter · No violations · Pure GR + scalar field.
 
-### Core Papers (click to open)
-
-- **[1. Kerr Metric Foundations](docs/Kerr_Metric_Review_v0.2.pdf)**  
-- **[2. Exact Resonance Frequency](docs/Resonance_Frequency_Calculation_v0.5.pdf)**  
-- **[3. Closed Timelike Curves Proof](docs/CTC_Existence_Theorem_v0.3.pdf)**  
-- **[4. 98 % Energy Extraction Efficiency](docs/Ergosphere_Pumping_Efficiency_v0.4.pdf)**  
-- **[5. Bollinger Scalar Field Ansatz](docs/bollinger_oscillation_derivation.tex.pdf)** ← the one you just compiled
-
-Master whitepaper (all five combined + cover) dropping in <30 min.
-
-Theory sources (LaTeX) → [/theory](theory/)  
-SymPy notebooks → [/math](math/)  
-Simulation stubs → [/simulations](simulations/)
-
-**Clones in the last 3 hours: 380+** — keep breaking it, the timeline thanks you.
-
-
+All in Docs in pdf format
