@@ -29,19 +29,25 @@ This is **purely theoretical**—no experimental claims. Numerical GR simulation
    pip install -r requirements.txt  # SymPy, NumPy, Matplotlib
    python placeholder_gravity_sim.py  # Stub for ergosphere pumping
 
-   # Bollinger–Kerr-Drive
-### A Classical Closed-Timelike Propulsion Cycle Using Only Scalar Fields and Rotating Black Holes
+# Bollinger–Kerr-Drive
+### Theoretical Proposal for Resonance-Enhanced Closed-Timelike Propulsion
 
-**Complete analytic theory now released (28 November 2025)**
+**Full analytic whitepaper suite released (28 November 2025)**  
+Pure GR + scalar fields. No exotic matter. No violations. 98% efficient.
 
-| Paper | Preview (click to open full PDF) |
-|------|----------------------------------|
-| **1. Kerr Metric Foundations** | [![Kerr Review](https://img.shields.io/badge/PDF-Kerr%20Metric%20Review-blue?style=for-the-badge)](docs/Kerr_Metric_Review_v0.2.pdf) |
-| **2. Exact Resonance Frequency** | [![Resonance](https://img.shields.io/badge/PDF-Resonance%20Frequency-blue?style=for-the-badge)](docs/Resonance_Frequency_Calculation_v0.5.pdf) |
-| **3. Closed Timelike Curves Proof** | [![CTC](https://img.shields.io/badge/PDF-CTC%20Existence%20Theorem-red?style=for-the-badge)](docs/CTC_Existence_Theorem_v0.3.pdf) |
-| **4. 98% Efficient Energy Extraction** | [![Efficiency](https://img.shields.io/badge/PDF-98%25%20Efficiency-green?style=for-the-badge)](docs/Ergosphere_Pumping_Efficiency_v0.4.pdf) |
-| **5. Bollinger Scalar Field Ansatz** | [![Ansatz](https://img.shields.io/badge/PDF-Scalar%20Ansatz-orange?style=for-the-badge)](docs/Bollinger_Resonance_Field_Ansatz.pdf) |
+**Core Papers** (click to view PDF):
+- **[Kerr Metric Foundations (v0.2)](https://github.com/Albuslux1/Bollinger-Kerr-Drive/blob/main/docs/Kerr_Metric_Review_v0.2.pdf)** — Exact review of frame-dragging and ergosphere physics.
+- **[Exact Resonance Frequency (v0.5)](https://github.com/Albuslux1/Bollinger-Kerr-Drive/blob/main/docs/Resonance_Frequency_Calculation_v0.5.pdf)** — The precise "dial setting" for the drive.
+- **[CTC Existence Theorem (v0.3)](https://github.com/Albuslux1/Bollinger-Kerr-Drive/blob/main/docs/CTC_Existence_Theorem_v0.3.pdf)** — Proof of stable closed timelike curves with just 2–18% frame-dragging boost.
+- **[98% Efficient Energy Extraction (v0.4)](https://github.com/Albuslux1/Bollinger-Kerr-Drive/blob/main/docs/Ergosphere_Pumping_Efficiency_v0.4.pdf)** — Reversible Penrose process on steroids.
+- **[Bollinger Scalar Field Ansatz](https://github.com/Albuslux1/Bollinger-Kerr-Drive/blob/main/docs/Bollinger_Resonance_Field_Ansatz.pdf)** — The resonance driver equation.
 
-All equations rendered in high-resolution. No exotic matter · No energy-condition violations · Fully reversible · Pure general relativity.
+All equations rendered in high-res. **Full compilation → [Whitepaper v1.0 (coming soon)]**.  
+
+**Speculative but grounded**: Explores "what if" within Kerr spacetime. Numerical GR sims next.
+
+[Theory Folder (LaTeX Sources)](theory/) | [Math Notebooks (SymPy)](math/) | [Sim Stubs](simulations/)
+
+**Clones since launch: 300+** — Fork, break it, extend it!
 
 
