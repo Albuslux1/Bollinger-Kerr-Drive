@@ -37,3 +37,5 @@ ds^2 = -\left(1 - \frac{2Mr}{\Sigma}\right) dt^2 + \frac{\Sigma}{\Delta} dr^2 + 
 ]
 where (\Sigma = r^2 + \alpha^2 \cos^2\theta), (\Delta = r^2 - 2Mr + \alpha^2), (\alpha = J/M).
 Bollinger fields introduce a perturbation (T_{\mu\nu} \to T_{\mu\nu} + h_{\mu\nu}(\phi)), resonating at (\omega \approx \Omega_H) (horizon angular velocity) to amplify (g_{t\phi}) .
+![Untitled](https://github.com/user-attachments/assets/2d69c27e-94b5-45ff-bf4f-41348ea8a640)
+
