@@ -1,0 +1,1 @@
+We model the resonance field as a scalar perturbation $\phi(r, \theta, t) = \Re\left[ A e^{i (\omega t - k r)} Y_{\ell m}(\theta, \phi) \right]$, tuned to the superradiant frequency $\omega < m \Omega_H$ for amplification. Coupling to the metric via $\delta g_{t\phi} \propto \phi \partial_\phi \phi$, it pumps the ergosphere without exotic matter—pure resonance torque.
