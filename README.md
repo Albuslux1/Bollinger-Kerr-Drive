@@ -29,25 +29,6 @@ This is **purely theoretical**—no experimental claims. Numerical GR simulation
    pip install -r requirements.txt  # SymPy, NumPy, Matplotlib
    python placeholder_gravity_sim.py  # Stub for ergosphere pumping
 
-# Bollinger–Kerr-Drive
-### Theoretical Proposal for Resonance-Enhanced Closed-Timelike Propulsion
-
-**Full analytic whitepaper suite released (28 November 2025)**  
-Pure GR + scalar fields. No exotic matter. No violations. 98% efficient.
-
-**Core Papers** (click to view PDF):
-- **[Kerr Metric Foundations (v0.2)](https://github.com/Albuslux1/Bollinger-Kerr-Drive/blob/main/docs/Kerr_Metric_Review_v0.2.pdf)** — Exact review of frame-dragging and ergosphere physics.
-- **[Exact Resonance Frequency (v0.5)](https://github.com/Albuslux1/Bollinger-Kerr-Drive/blob/main/docs/Resonance_Frequency_Calculation_v0.5.pdf)** — The precise "dial setting" for the drive.
-- **[CTC Existence Theorem (v0.3)](https://github.com/Albuslux1/Bollinger-Kerr-Drive/blob/main/docs/CTC_Existence_Theorem_v0.3.pdf)** — Proof of stable closed timelike curves with just 2–18% frame-dragging boost.
-- **[98% Efficient Energy Extraction (v0.4)](https://github.com/Albuslux1/Bollinger-Kerr-Drive/blob/main/docs/Ergosphere_Pumping_Efficiency_v0.4.pdf)** — Reversible Penrose process on steroids.
-- **[Bollinger Scalar Field Ansatz](https://github.com/Albuslux1/Bollinger-Kerr-Drive/blob/main/docs/Bollinger_Resonance_Field_Ansatz.pdf)** — The resonance driver equation.
-
-All equations rendered in high-res. **Full compilation → [Whitepaper v1.0 (coming soon)]**.  
-
-**Speculative but grounded**: Explores "what if" within Kerr spacetime. Numerical GR sims next.
-
-[Theory Folder (LaTeX Sources)](theory/) | [Math Notebooks (SymPy)](math/) | [Sim Stubs](simulations/)
-
-**Clones since launch: 300+** — Fork, break it, extend it!
+#
 
 
