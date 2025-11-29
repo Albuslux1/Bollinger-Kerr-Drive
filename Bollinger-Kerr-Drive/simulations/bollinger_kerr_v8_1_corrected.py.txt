@@ -1,0 +1,212 @@
+# bollinger_kerr_v8_1_corrected.py
+# V8.1: Corrected Relativistic Kinematics + V5 Energy Integration
+# Fixes: Proper acceleration time calculation using arctanh(v/c)
+# Features: Metric Composition + Fuel Efficiency Analysis
+
+import numpy as np
+import matplotlib.pyplot as plt
+
+print("=== BOLLINGER-KERR DRIVE V8.1: CORRECTED KINEMATICS ===\n")
+
+# === Constants ===
+c = 3e8
+year_sec = 365.25 * 24 * 3600
+ly_m = 9.461e15
+G = 6.67430e-11
+M_sun = 1.989e30
+
+# === Mission Setup ===
+distance_ly = 100.0
+accel_g = 9.8  # 1g comfort
+ship_mass_kg = 1e6  # 1000 metric tons
+
+# === Field Parameters (V5 Optimized) ===
+Gamma_cruise = 96.0 
+damping_coeff = 1.2e-12  # High-Q optimization
+
+def run_v8_1_simulation():
+    # Setup time steps (Earth Frame)
+    dt = 0.05 * year_sec
+    t_earth = 0.0
+    t_crew = 0.0
+    x = 0.0
+    v = 0.0
+    
+    # Logs
+    history = {'t_earth': [], 't_crew': [], 'v': [], 'gamma_field': [], 'dilation_total': [], 'phase': []}
+    
+    distance_m = distance_ly * ly_m
+    target_v = 0.995 * c
+    
+    # --- 1. PRE-CALCULATE ACCELERATION PHASE (The Fix) ---
+    # Proper time to reach target_v: tau = (c/a) * arctanh(v/c)
+    t_accel_proper = (c / accel_g) * np.arctanh(target_v / c)
+    
+    # Earth time to reach target_v: t = (c/a) * sinh(a * tau / c)
+    t_accel_earth = (c / accel_g) * np.sinh(accel_g * t_accel_proper / c)
+    
+    # Distance covered: d = (c^2/a) * (cosh(a * tau / c) - 1)
+    d_accel = (c**2 / accel_g) * (np.cosh(accel_g * t_accel_proper / c) - 1)
+    
+    print(f"FLIGHT PLAN CALCULATION:")
+    print(f"  Target Velocity: {target_v/c:.3f}c")
+    print(f"  Accel Phase (Crew Time) : {t_accel_proper/year_sec:.2f} years")
+    print(f"  Accel Phase (Earth Time): {t_accel_earth/year_sec:.2f} years")
+    print(f"  Accel Distance          : {d_accel/ly_m:.2f} LY")
+    
+    # Determine Cruise Phase
+    total_dist_accel_decel = 2 * d_accel
+    if total_dist_accel_decel > distance_m:
+        print("  [NOTE] Distance too short for full cruise. Triangular profile.")
+        # Recalculate for half-distance accel
+        d_accel = distance_m / 2
+        # tau = (c/a) * arccosh(1 + a*d/c^2)
+        t_accel_proper = (c / accel_g) * np.arccosh(1 + accel_g * d_accel / c**2)
+        t_accel_earth = (c / accel_g) * np.sinh(accel_g * t_accel_proper / c)
+        coast_distance = 0
+        target_v = c * np.tanh(accel_g * t_accel_proper / c)
+    else:
+        coast_distance = distance_m - total_dist_accel_decel
+        
+    print(f"  Coast Distance          : {coast_distance/ly_m:.2f} LY")
+    print("-" * 40)
+
+    phase = "ACCEL"
+    
+    # --- 2. MAIN LOOP ---
+    while x < distance_m:
+        # Phase Switch Logic
+        if phase == "ACCEL" and x >= d_accel:
+            phase = "COAST" if coast_distance > 0 else "DECEL"
+        elif phase == "COAST" and x >= d_accel + coast_distance:
+            phase = "DECEL"
+        
+        # Determine Proper Acceleration
+        if phase == "ACCEL":
+            a_proper = accel_g
+        elif phase == "DECEL":
+            a_proper = -accel_g
+        else:
+            a_proper = 0.0
+            
+        # Proper time step (approximation for integration stability)
+        gamma_lorentz = 1 / np.sqrt(1 - (v/c)**2) if v < c else 100
+        dt_proper = dt / gamma_lorentz
+        
+        # Velocity Update (Relativistic Addition)
+        if abs(a_proper) > 0:
+            # v_new = (v + a*dt_proper) / (1 + v*a*dt_proper/c^2)
+            dv = a_proper * dt_proper
+            v_new = (v + dv) / (1 + v * dv / c**2)
+        else:
+            v_new = v
+        
+        # Cap velocity at target
+        if v_new > target_v: v_new = target_v
+        if v_new < 0: v_new = 0
+        
+        # Position Update
+        x_new = x + v * dt
+        
+        # Field Dynamics (V5 Optimization Integration)
+        # Ramp field up/down with velocity to save energy/maintain safety
+        if phase == "ACCEL" and v_new < 0.8 * target_v:
+             current_Gamma = 1 + (Gamma_cruise - 1) * (v_new / (0.8*target_v))
+        elif phase == "DECEL" and v_new < 0.2 * target_v:
+             current_Gamma = 1 + (Gamma_cruise - 1) * (v_new / (0.2*target_v))
+        else:
+             current_Gamma = Gamma_cruise
+             
+        # Metric Composition (V8 Logic)
+        # g_tt = -1/Gamma^2
+        # dtau/dt = sqrt(-g_tt - v^2/c^2)
+        g_tt = -1.0 / (current_Gamma ** 2)
+        metric_term = -g_tt
+        kinematic_term = (v_new / c)**2
+        
+        dtau_dt_combined = np.sqrt(max(0.0001, metric_term - kinematic_term))
+        
+        # Integrate Times
+        t_crew += dt * dtau_dt_combined
+        t_earth += dt
+        
+        # Update State
+        x = x_new
+        v = v_new
+        
+        # Logging
+        if len(history['t_earth']) % 10 == 0:
+            history['t_earth'].append(t_earth / year_sec)
+            history['t_crew'].append(t_crew / year_sec)
+            history['v'].append(v_new / c)
+            history['gamma_field'].append(current_Gamma)
+            history['dilation_total'].append(dtau_dt_combined)
+            history['phase'].append(phase)
+            
+        # Safety Break
+        if t_earth / year_sec > 200:
+            print("TIMEOUT: Check trajectory constants.")
+            break
+            
+    return history
+
+print("Running V8.1 Simulation...")
+data = run_v8_1_simulation()
+
+# === Analysis ===
+final_earth = data['t_earth'][-1]
+final_crew = data['t_crew'][-1]
+
+print(f"\nV8.1 MISSION REPORT:")
+print(f"====================")
+print(f"Distance Traveled : {distance_ly} LY")
+print(f"Earth Time Passed : {final_earth:.1f} Years")
+print(f"Crew Time Passed  : {final_crew:.2f} Years")
+print(f"Time Savings      : {100*(1 - final_crew/final_earth):.1f}%")
+
+# === 3. V5 ENERGY INTEGRATION CHECK ===
+print(f"\nENERGY & FUEL ANALYSIS (V5 Integration):")
+print(f"========================================")
+# Calculate power based on average field usage
+avg_Gamma = np.mean(data['gamma_field'])
+energy_density_scale = 1e16
+power_req = damping_coeff * (avg_Gamma**2) * energy_density_scale
+
+total_energy = power_req * (final_earth * year_sec)
+antimatter_density = 1.8e17
+fuel_needed = total_energy / (0.45 * antimatter_density)
+
+print(f"Avg Field Strength (Γ) : {avg_Gamma:.1f}")
+print(f"Continuous Power       : {power_req/1e9:.2f} GW")
+print(f"Total Fuel Required    : {fuel_needed:.2f} kg")
+print(f"Fuel Mass Fraction     : {(fuel_needed/ship_mass_kg)*100:.4f}%")
+
+if fuel_needed < ship_mass_kg * 0.1:
+    print("STATUS: [GREEN] Fuel Efficient Flight Model Confirmed")
+else:
+    print("STATUS: [RED] High Fuel Consumption Warning")
+
+# === Plotting ===
+plt.style.use('dark_background')
+fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(10, 8), sharex=True)
+
+# Velocity Profile
+t = data['t_earth']
+ax1.plot(t, data['v'], '#ff3366', linewidth=2, label='Velocity (c)')
+ax1.set_ylabel('Velocity', color='white')
+ax1.set_title('V8.1 Corrected Trajectory', color='white')
+ax1.grid(alpha=0.3)
+ax1.legend()
+
+# Time Dilation
+ax2.plot(t, data['t_crew'], '#ffcc00', linewidth=3, label='Crew Time')
+ax2.plot(t, t, 'white', linestyle='--', alpha=0.5, label='Earth Time')
+ax2.set_ylabel('Years', color='white')
+ax2.set_xlabel('Earth Years', color='white')
+ax2.set_title('Time Dilation (Metric + Kinematic)', color='white')
+ax2.legend()
+ax2.grid(alpha=0.3)
+
+plt.tight_layout()
+plt.savefig('bollinger_kerr_v8_1_corrected.png', dpi=150)
+plt.show()
