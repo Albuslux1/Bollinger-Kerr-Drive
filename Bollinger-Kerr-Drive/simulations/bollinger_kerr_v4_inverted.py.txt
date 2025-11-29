@@ -1,0 +1,101 @@
+# bollinger_kerr_v4_inverted.py
+# V4: Inverted Coupling Test
+# Goal: Drive dtau/dt -> 0 (Maximum Time Dilation / Stasis Mode)
+
+import numpy as np
+import matplotlib.pyplot as plt
+from scipy.integrate import solve_ivp
+
+# === Kerr Black Hole Parameters ===
+M = 1.0
+a = 0.998
+# Ship position: Safe zone outside static limit (2.5M)
+r_ship = 2.5 * M  
+theta_ship = np.pi / 2
+distance_ly = 100.0
+
+# === Cloud Parameters (High Gain) ===
+# We allow Gamma to grow higher here to test the limit
+gamma_0 = 1.8e-6    
+damping_coeff = 1.5e-9  # Tuned for higher saturation (Gamma ~ 10-12)
+
+# === Metric Helper Functions ===
+def Sigma(r, theta):
+    return r**2 + a**2 * np.cos(theta)**2
+
+def g_tt_kerr(r, theta):
+    return -(1 - 2*M*r / Sigma(r, theta))
+
+def proper_time_rate(r, theta, Gamma=1.0):
+    # === INVERTED COUPLING ===
+    # We divide the metric potential by Gamma.
+    # As Gamma increases, the effective potential deepens.
+    # This mimics approaching the Event Horizon without changing location.
+    g_tt_base = g_tt_kerr(r, theta)
+    
+    # Safety clamp: Gamma cannot be < 1
+    Gamma_safe = max(Gamma, 1.0)
+    
+    # The Physics Pivot: Inverting the coupling
+    # g_tt_eff goes closer to 0 as Gamma increases
+    g_tt_eff = g_tt_base / (Gamma_safe**2) 
+    
+    return np.sqrt(-g_tt_eff)
+
+# === Cloud Evolution ===
+def dGamma_dt(t, Gamma):
+    return gamma_0 * Gamma - damping_coeff * Gamma**3
+
+# === Run Simulation ===
+print("Running Bollinger-Kerr V4 (Inverted Coupling)...")
+duration = 3e6
+sol = solve_ivp(dGamma_dt, [0, duration], [1.0], 
+                t_eval=np.linspace(0, duration, 10000), rtol=1e-10)
+
+t = sol.t
+Gamma = sol.y[0]
+
+# === Analysis ===
+Gamma_final = Gamma[-1]
+dtau_dt_final = proper_time_rate(r_ship, theta_ship, Gamma_final)
+
+# Kinematics
+effective_c = 1.0 / dtau_dt_final
+earth_time = distance_ly
+crew_time = distance_ly * dtau_dt_final
+
+print("\n" + "="*60)
+print(f"V4 RESULTS: VIRTUAL HORIZON ACHIEVED")
+print(f"Final Scalar Gain (Gamma)    : {Gamma_final:.2f}")
+print(f"Proper Time Rate (dtau/dt)   : {dtau_dt_final:.4f}")
+print(f"Effective Velocity (Subjective): {effective_c:.2f} c")
+print("-" * 30)
+print(f"Mission: 100 Light Years")
+print(f"   Earth Time                : {earth_time:.1f} years")
+print(f"   Crew Time                 : {crew_time:.1f} years")
+print(f"   Time Saved                : {earth_time - crew_time:.1f} years")
+print("="*60)
+print("NOTE: Crew is effectively in gravitational stasis.")
+
+# === Plotting ===
+plt.style.use('dark_background')
+fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(10, 8), sharex=True)
+
+# Field Growth
+ax1.plot(t/1e6, Gamma, '#00ffcc', lw=2)
+ax1.set_ylabel('Scalar Field Gamma', color='#00ffcc')
+ax1.set_title(f'V4 Inverted Coupling: Virtual Horizon Generation', fontsize=14, color='white')
+ax1.grid(alpha=0.2)
+
+# Time Dilation ("The Drop")
+ax2.plot(t/1e6, proper_time_rate(r_ship, theta_ship, Gamma), '#ff0055', lw=2)
+ax2.axhline(dtau_dt_final, color='white', ls=':', alpha=0.5)
+ax2.set_ylabel('Time Rate (dtau/dt)', color='#ff0055')
+ax2.set_xlabel('Coordinate Time (Millions)', color='white')
+ax2.text(0.5, 0.5, 'Approaching Stasis', transform=ax2.transAxes, 
+         color='white', alpha=0.5, ha='center')
+ax2.grid(alpha=0.2)
+
+plt.tight_layout()
+plt.savefig('bollinger_kerr_v4_inverted.png', dpi=150)
+print("Plot saved.")
