@@ -1,0 +1,97 @@
+### Proto-Thorn Sketch for VacuumCondensate
+
+Based on standard Einstein Toolkit practices for matter thorns (like GRHydro or those using ADMCoupling/TmunuBase), here's a prototype thorn configuration for your "VacuumCondensate" module. This would allow it to contribute a custom stress-energy tensor \( T_{\mu\nu} \) for the relativistic vacuum condensate drive, incorporating your resonance frequency (\(\omega_{res}\)) as a parameter. The tensor could be modeled as an effective fluid with negative pressure (e.g., for warp-like expansion), tuned by resonance to amplify frame-dragging.
+
+I've kept it simple: The thorn inherits from ADMBase (for metric access) and TmunuBase (for stress-energy interface), declares a parameter for \(\omega_{res}\), schedules a function to compute contributions, and uses the CalcTmunu.inc mechanism for adding to \( T_{\mu\nu} \). In a real thorn, you'd add src/ files with Fortran/C code to implement the actual computation (e.g., based on superfluid analogies from our earlier sims).
+
+Create a directory like `arrangements/VacuumCondensate/` with these files:
+
+#### interface.ccl
+This declares the thorn's implementation, inheritance, and includes for the stress-energy coupling.
+```
+IMPLEMENTS: VacuumCondensate
+
+INHERITS: ADMBase TmunuBase
+
+FRIEND: ADMCoupling  # For seamless coupling without direct dependencies
+
+# Include headers/sources for Tmunu contributions
+INCLUDES HEADER: VacuumCondensate_CalcTmunu_temps.inc in CalcTmunu_temps.inc
+INCLUDES SOURCE: VacuumCondensate_CalcTmunu.inc in CalcTmunu.inc
+
+# Example grid functions (GFs) for internal variables, e.g., condensate density
+CCTK_REAL condensate_density TYPE=GF TIMELEVELS=3
+{
+  TAGS='tensortypealias="Scalar" Prolongation="None"'
+} "Effective density of the vacuum condensate"
+```
+
+#### param.ccl
+Parameters for configuring the condensate, including your 10.3 MHz heuristic.
+```
+# Resonance frequency (heuristic from community challenge)
+CCTK_REAL omega_res "Resonance frequency for second sound in vacuum condensate"
+{
+  * :: "Any positive value in Hz"
+} 10.3e6 "Default heuristic; community to derive exact value"
+
+# Other params for tuning Tmunu (e.g., effective pressure scaling)
+CCTK_REAL condensate_pressure_factor "Scaling factor for negative pressure in condensate"
+{
+  -10.0:* :: "Negative for expansion/warp effects"
+} -1.0 "Default for de Sitter-like behavior"
+
+CCTK_REAL min_density_threshold "Minimum density below which condensate is ignored (atmosphere handling)"
+{
+  1e-12:* :: "Small positive value"
+} 1e-9 "Avoid numerical issues in dilute regions"
+```
+
+#### schedule.ccl
+Schedules when to compute the stress-energy contributions, tying into evolution bins.
+```
+# Schedule computation during evolution, after metric updates but before constraints
+SCHEDULE VacuumCondensate_ComputeTmunu IN CCTK_EVOL AFTER ADMBase_PostTimelevels BEFORE ADMConstraints
+{
+  LANG: Fortran  # Or C, depending on your src implementation
+  OPTIONS: LEVEL
+} "Compute stress-energy tensor contributions for vacuum condensate"
+
+# Optional: Paramcheck for validation
+SCHEDULE VacuumCondensate_ParamCheck AT CCTK_PARAMCHECK
+{
+  LANG: C
+} "Validate parameters like omega_res"
+```
+
+#### src/VacuumCondensate_CalcTmunu_temps.inc (Stub)
+Temporary variables for Tmunu computation (Fortran-style, as per ADMCoupling).
+```
+CCTK_REAL :: rho_cond, p_cond, u_mu(0:3), b_mu(0:3)  ! Condensate density, pressure, 4-velocity, effective field
+CCTK_REAL :: resonance_amp  ! Amplification from omega_res
+```
+
+#### src/VacuumCondensate_CalcTmunu.inc (Stub)
+Core contribution to \( T_{\mu\nu} \). This adds terms loop-over-grid style; adapt to your model (e.g., rho from resonance, p = -rho * factor for compression).
+```
+! Example: Effective perfect fluid with resonance-tuned density
+resonance_amp = sin(omega_res * cctk_time)  ! Placeholder oscillation; tie to second sound u2 from sims
+
+rho_cond = min_density_threshold + resonance_amp * (some_function_of_metric(gxx, gxy, ...))  ! Compute from ADM vars
+p_cond = condensate_pressure_factor * rho_cond  ! Negative for warp bubble
+
+! Assume u_mu from fluid-like approximation (e.g., at rest: u^0=1/sqrt(-g00), u^i=0)
+u_mu(0) = 1.0 / sqrt(-gaa)  ! Simplified; use full 4-velocity
+u_mu(1:3) = 0.0
+
+! Add to Tmunu components (perfect fluid form)
+Ttt = Ttt + (rho_cond + p_cond) * u_mu(0)**2 + p_cond * gaa  ! Time-time
+Ttx = Ttx + (rho_cond + p_cond) * u_mu(0) * u_mu(1)        ! Time-x
+! ... (similar for tty, ttz, txx, txy, etc. - full symmetric tensor)
+Txx = Txx + (rho_cond + p_cond) * u_mu(1)**2 + p_cond * gxx
+! Add EM-like terms if modeling as superfluid with b_mu
+```
+
+To integrate: Add this thorn to your thornlist, compile with `make`, and reference it in param files (e.g., set `ActiveThorns = "... VacuumCondensate"`). For full functionality, implement the scheduled routines in src/ (e.g., VacuumCondensate_ComputeTmunu.F90 to populate the inc files dynamically).
+
+This is a starting sketch—ties into our prior frequency sweeps (use omega_res from community derivations) and keeps it modular for Tier 4 damping. If it blows up in sims, tweak the min_threshold or add damping terms. Want to refine (e.g., add MHD-like fields for vortices) or test a Python mockup first?
