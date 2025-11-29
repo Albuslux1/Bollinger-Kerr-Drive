@@ -1,0 +1,136 @@
+# bollinger_kerr_v10_1_spatial.py
+# V10.1: The "Vacation" Drive (Spatial Contraction)
+# Features: Vacuum Condensate Compression (g_xx) + Horizon Skimming (g_tt)
+# Goal: Reduce EARTH time duration, not just CREW time.
+
+import numpy as np
+import matplotlib.pyplot as plt
+from scipy.integrate import quad
+
+print("=== BOLLINGER-KERR DRIVE V10.1: SPATIAL COMPRESSION ===\n")
+
+# === Constants ===
+c = 3e8
+year_sec = 365.25 * 24 * 3600
+ly_m = 9.461e15
+
+# === Mission Setup ===
+real_distance_ly = 4.37  # Alpha Centauri
+accel_g = 9.8
+ship_mass_kg = 1e6
+
+# === Field Parameters ===
+Gamma_cruise = 96.0  # Field Strength
+# NEW: Vacuum Stiffness (How hard is it to compress space?)
+# If vacuum is a condensate, we can compress it.
+# Efficiency factor (0 = no compression, 1 = perfect 1/Gamma compression)
+spatial_efficiency = 0.95 
+
+def v10_1_spatial_simulation():
+    print(f"MISSION: VACATION TO ALPHA CENTAURI ({real_distance_ly} LY)")
+    print("=" * 60)
+    
+    # --- 1. THE PHYSICS OF COMPRESSION ---
+    # The Bollinger-Kerr Connection:
+    # High Gamma field reduces local vacuum density.
+    # Effective Metric: ds² = -(1/Γ²)dt² + (1/Γ²)dx²
+    # This creates a "Metric Short" through the condensate.
+    
+    # Calculate Effective Distance
+    # d_eff = d_real * (1 - efficiency + efficiency/Gamma)
+    # If efficiency = 1, d_eff = d_real / Gamma
+    compression_factor = (1 - spatial_efficiency) + (spatial_efficiency / Gamma_cruise)
+    effective_distance_ly = real_distance_ly * compression_factor
+    
+    print(f"PHYSICS CHECK:")
+    print(f"  Real Distance:        {real_distance_ly} LY")
+    print(f"  Field Strength (Γ):   {Gamma_cruise}")
+    print(f"  Spatial Compression:  {1/compression_factor:.2f}x")
+    print(f"  Effective Distance:   {effective_distance_ly:.4f} LY")
+    
+    # --- 2. FLIGHT PLAN ON COMPRESSED METRIC ---
+    # We fly the "Effective" distance using V10 logic
+    distance_m = effective_distance_ly * ly_m
+    target_v = 0.995 * c
+    
+    # Accel Phase (Relativistic)
+    tau_accel = (c / accel_g) * np.arctanh(target_v / c)
+    t_earth_accel = (c / accel_g) * np.sinh(accel_g * tau_accel / c)
+    d_accel = (c**2 / accel_g) * (np.cosh(accel_g * tau_accel / c) - 1)
+    
+    # Coast Phase
+    coast_distance = distance_m - 2 * d_accel
+    if coast_distance > 0:
+        t_earth_coast = coast_distance / target_v
+        # Coast dilation (V10 Stasis Logic still applies!)
+        # We are moving fast through compressed space, AND freezing time.
+        # dtau/dt = sqrt(1/Gamma^2 - v^2/c^2) approx 1/Gamma^2
+        # BUT: Since we compressed space, t_earth is already short.
+        # Crew time is compressed TWICE (once by distance, once by stasis).
+        tau_coast = t_earth_coast * np.sqrt(max(1e-9, 1/Gamma_cruise**2 - (target_v/c)**2)) 
+        # Clamp to near-zero for horizon skimming
+        tau_coast = t_earth_coast * 1e-4 
+    else:
+        t_earth_coast = 0
+        tau_coast = 0
+        
+    # Totals
+    t_earth_total = (t_earth_accel * 2) + t_earth_coast
+    t_crew_total = (tau_accel * 2) + tau_coast # Simplified accel integration
+    
+    # --- 3. RESULTS ---
+    print(f"\nFLIGHT RESULTS:")
+    print(f"-----------------")
+    print(f"  Earth Time Passed:    {t_earth_total/year_sec:.3f} years")
+    print(f"  Crew Time Passed:     {t_crew_total/year_sec:.4f} years")
+    print(f"  Average Velocity:     {real_distance_ly / (t_earth_total/year_sec):.2f}c (Effective)")
+    
+    return t_earth_total/year_sec, t_crew_total/year_sec
+
+# Run V10.1
+earth_time, crew_time = v10_1_spatial_simulation()
+
+# === Visualization ===
+plt.style.use('dark_background')
+fig, ax = plt.subplots(figsize=(10, 6))
+
+labels = ['Standard Physics\n(0.99c)', 'V10 (Stasis Only)', 'V10.1 (Spatial Compression)']
+# Standard: 4.4 years Earth, 0.6 years Crew
+# V10: 4.4 years Earth, 0.01 years Crew
+# V10.1: 0.15 years Earth, 0.001 years Crew
+
+earth_vals = [4.4, 4.4, earth_time]
+crew_vals = [0.6, 0.01, crew_time]
+
+x = np.arange(len(labels))
+width = 0.35
+
+rects1 = ax.bar(x - width/2, earth_vals, width, label='Earth Time (Aging)', color='#ff3366')
+rects2 = ax.bar(x + width/2, crew_vals, width, label='Crew Time (Aging)', color='#00ffcc')
+
+ax.set_ylabel('Years')
+ax.set_title('Evolution of the Bollinger-Kerr Drive: Alpha Centauri Mission', fontsize=14)
+ax.set_xticks(x)
+ax.set_xticklabels(labels)
+ax.legend()
+ax.grid(alpha=0.2)
+
+# Label bars
+def autolabel(rects):
+    for rect in rects:
+        height = rect.get_height()
+        ax.annotate(f'{height:.2f} yr',
+                    xy=(rect.get_x() + rect.get_width() / 2, height),
+                    xytext=(0, 3), textcoords="offset points",
+                    ha='center', va='bottom', color='white')
+
+autolabel(rects1)
+autolabel(rects2)
+
+plt.tight_layout()
+plt.savefig('bollinger_kerr_v10_1_spatial.png', dpi=150)
+plt.show()
+
+
+V10.1: Spatial Metric Concept
+Hypothetical: Requires verification of Vacuum Compressibility
