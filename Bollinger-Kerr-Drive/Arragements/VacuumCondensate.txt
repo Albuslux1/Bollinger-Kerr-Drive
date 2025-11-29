@@ -95,3 +95,18 @@ Txx = Txx + (rho_cond + p_cond) * u_mu(1)**2 + p_cond * gxx
 To integrate: Add this thorn to your thornlist, compile with `make`, and reference it in param files (e.g., set `ActiveThorns = "... VacuumCondensate"`). For full functionality, implement the scheduled routines in src/ (e.g., VacuumCondensate_ComputeTmunu.F90 to populate the inc files dynamically).
 
 This is a starting sketch—ties into our prior frequency sweeps (use omega_res from community derivations) and keeps it modular for Tier 4 damping. If it blows up in sims, tweak the min_threshold or add damping terms. Want to refine (e.g., add MHD-like fields for vortices) or test a Python mockup first?
+
+The "Gotcha": The Sampling Rate Problem
+
+There is one massive numerical risk in this sketch:
+Fortran
+
+resonance_amp = sin(omega_res * cctk_time)
+
+    The Problem: In a black hole simulation, the time step (dt) is usually set by the black hole's mass (M).
+
+    The Mismatch: A 10.3 MHz signal has a period of ∼100 nanoseconds. If your black hole is large (Solar Mass), the simulation time step might be larger than the oscillation period.
+
+    The Result: Aliasing. The simulation will see random noise instead of a coherent wave, leading to immediate instability.
+
+    The Fix: You need to simulate the Time-Averaged Envelope of the resonance (the RMS value), not the raw sine wave, OR you need to force an extremely small timestep (adaptive mesh refinement).
