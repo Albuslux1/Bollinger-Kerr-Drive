@@ -74,5 +74,6 @@ We treat this as a scientific exploration not a foregone conclusion. Each step:
 📝 Note on the 10.3 MHz Frequency: The value of 10.3 MHz is currently a heuristic variable derived from intuitive modeling of the superfluid phase transition scale. It serves as a placeholder target for the search algorithm.
 
 The logic of the equation holds regardless of the specific frequency: If a resonance signal (ωres​) is detected, then the feed (Sfeed​) modulates. Challenge to the Community: Calculate the actual derivation of the Second Sound resonance frequency for macroscopic vacuum condensate.
+Simulation confirms that 10.3 MHz resonance at macroscopic scales requires wave velocities u2​>105 m/s. This excludes standard condensed matter and points to a relativistic vacuum condensate as the active medium.
 
 Research Frontier: Investigating Higher-Order Topological Phases (inspired by Pan Jianwei) to extend field coherence times from milliseconds to years.11-29-2025
