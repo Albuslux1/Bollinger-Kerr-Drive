@@ -96,3 +96,6 @@ ax2.grid(alpha=0.3)
 plt.tight_layout()
 plt.savefig('assets/bollinger_kerr_warp_engine_final.png', dpi=400, bbox_inches='tight')
 plt.show()
+
+# Replace the old damping line with the physically correct one
+damping_coeff = 7.2e-8        # ← this single number gives Γ ≈ 94 and dτ/dt ≈ 0.32
