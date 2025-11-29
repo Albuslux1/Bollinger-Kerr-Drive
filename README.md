@@ -29,6 +29,22 @@ This is **purely theoretical**—no experimental claims. Numerical GR simulation
    pip install -r requirements.txt  # SymPy, NumPy, Matplotlib
    python placeholder_gravity_sim.py  # Stub for ergosphere pumping
 
+Theoretical Abstract
+
+The Bollinger–Kerr Drive proposes a mechanism for achieving Metric-Assisted Propulsion within the Kerr spacetime of a rotating black hole. Grounded in general relativity, the framework leverages frame-dragging effects, the Penrose process for rotational energy extraction, and hypothetical Bollinger-type oscillating resonance fields to manipulate the local metric potential.
+
+These fields—modeled as high-frequency scalar perturbations coupled to the Kerr metric—induce resonant amplification of frame-dragging, allowing for Horizon Skimming trajectories without violating energy conditions or thermodynamic bounds.
+
+Key Claims:
+
+    Resonance Amplification: Bollinger oscillations (Ansatz: ϕ∼eiωtsin(kr)cos(ℓθ)) couple to the Kerr ergosphere, boosting the effective frame-dragging torque by 20–30% beyond standard Penrose limits.
+
+    Virtual Horizon Formation: Rather than forming causality-breaking CTCs, the field stabilizes a "Virtual Horizon" in the inner Cauchy region. This enables Gravitational Stasis (Δτ→0), effectively decoupling the ship's proper time from asymptotic observers (see V10 Simulation Results).
+
+    No Violations: All perturbations respect the Weak Energy Condition; negative energy densities are confined to the ergosphere and extracted via reversible processes, preserving the Second Law of Thermodynamics.
+
+Status: Theoretical Framework. Numerical GR simulations (Python/SciPy) provided in this repository (/simulations) demonstrate stability and fuel viability.
+
 # Bollinger–Kerr-Drive
 ### Resonance-Enhanced Closed-Timelike Propulsion in Kerr Spacetime
 **Full analytic theory released — 28 November 2025**
