@@ -1,0 +1,284 @@
+import numpy as np
+import matplotlib.pyplot as plt
+from scipy.integrate import solve_ivp
+from dataclasses import dataclass
+from typing import Callable, Optional
+import warnings
+
+@dataclass
+class KerrParameters:
+    """Kerr black hole physical parameters"""
+    M: float = 1.0                    # Mass (geometric units)
+    a: float = 0.998                  # Spin parameter
+    m: int = 1                        # Azimuthal quantum number
+    
+    @property
+    def r_plus(self):
+        return self.M + np.sqrt(self.M**2 - self.a**2)
+    
+    @property 
+    def Omega_H(self):
+        return self.a / (2 * self.M * self.r_plus)
+
+@dataclass
+class QuantumThermostat:
+    """Dynamic feedback control using phase-slip signals"""
+    # Phase-slip detection
+    phase_slip_threshold: float = 0.1
+    slip_integral: float = 0.0
+    slip_history: list = None
+    
+    # PID-like control
+    Kp: float = 1.0e-3    # Proportional gain
+    Ki: float = 1.0e-6    # Integral gain  
+    Kd: float = 1.0e-4    # Derivative gain
+    
+    def __post_init__(self):
+        self.slip_history = []
+    
+    def detect_phase_slip(self, Gamma: float, dGamma_dt: float, dt: float) -> float:
+        """Detect phase slips in frame-dragging evolution"""
+        # Phase slip when acceleration changes sign rapidly
+        if len(self.slip_history) >= 2:
+            accel_prev = (self.slip_history[-1] - self.slip_history[-2]) / dt
+            accel_current = dGamma_dt
+            slip_magnitude = abs(accel_current - accel_prev) / (1.0 + abs(accel_prev))
+            
+            if slip_magnitude > self.phase_slip_threshold:
+                self.slip_integral += slip_magnitude * dt
+                return slip_magnitude
+        return 0.0
+    
+    def control_signal(self, Gamma: float, dGamma_dt: float, dt: float) -> float:
+        """Generate damping control signal based on phase slips"""
+        slip = self.detect_phase_slip(Gamma, dGamma_dt, dt)
+        self.slip_history.append(Gamma)
+        
+        # Keep history manageable
+        if len(self.slip_history) > 1000:
+            self.slip_history.pop(0)
+            
+        # PID control based on phase slips
+        control = (self.Kp * slip + 
+                  self.Ki * self.slip_integral + 
+                  self.Kd * (slip / dt if dt > 0 else 0))
+        
+        return control
+
+@dataclass  
+class SuperfluidRenormalization:
+    """Quantum corrections via superfluid spacetime hypothesis"""
+    planck_mass: float = 1.0  # Geometric units
+    superfluid_coherence_length: float = 1.0e-5
+    vortex_quantization_scale: float = 2.0 * np.pi
+    
+    def renormalized_growth_rate(self, Gamma: float, M: float) -> float:
+        """Apply superfluid renormalization to growth rate"""
+        # Vortex quantization suppresses high-frequency modes
+        coherence_factor = np.exp(-Gamma / self.vortex_quantization_scale)
+        
+        # Planck-scale cutoff
+        planck_cutoff = 1.0 / (1.0 + (Gamma * M / self.planck_mass)**2)
+        
+        return coherence_factor * planck_cutoff
+    
+    def quantum_backreaction(self, Gamma: float, dGamma_dt: float, M: float) -> float:
+        """Quantum corrections to backreaction"""
+        # Superfluid turbulence suppression
+        turbulence_suppression = 1.0 / (1.0 + (dGamma_dt / self.superfluid_coherence_length)**2)
+        
+        # Renormalized coupling
+        renormalized_coupling = self.renormalized_growth_rate(Gamma, M)
+        
+        return turbulence_suppression * renormalized_coupling
+
+class HorizonStabilityGate:
+    """Min-Gate implementation for horizon stability under perturbations"""
+    
+    def __init__(self, kerr_params: KerrParameters):
+        self.params = kerr_params
+        self.stability_threshold = 0.01  # Maximum allowed horizon deformation
+        
+    def horizon_deformation(self, Gamma: float) -> float:
+        """Calculate horizon deformation from frame-dragging amplification"""
+        # Based on Teukolsky perturbation analysis
+        deformation = (Gamma - 1.0) * self.params.a / self.params.M
+        return abs(deformation)
+    
+    def stability_condition(self, Gamma: float, dGamma_dt: float) -> bool:
+        """Check if horizon remains stable under perturbation"""
+        deformation = self.horizon_deformation(Gamma)
+        deformation_rate = abs(dGamma_dt) * self.params.a / self.params.M
+        
+        # Stability requires both deformation and rate are small
+        return (deformation < self.stability_threshold and 
+                deformation_rate < self.stability_threshold * 0.1)
+    
+    def apply_stability_gate(self, Gamma: float, dGamma_dt: float, dt: float) -> float:
+        """Apply stability-preserving gate to evolution"""
+        if not self.stability_condition(Gamma, dGamma_dt):
+            # Reduce growth rate to maintain stability
+            stability_factor = self.stability_threshold / max(self.horizon_deformation(Gamma), 1e-10)
+            return dGamma_dt * min(stability_factor, 1.0)
+        return dGamma_dt
+
+class BollingerCloudSimulator:
+    """Complete simulator with all advanced features"""
+    
+    def __init__(self, kerr_params: KerrParameters, use_hawking: bool = False):
+        self.params = kerr_params
+        self.use_hawking = use_hawking
+        
+        # Initialize components
+        self.thermostat = QuantumThermostat()
+        self.superfluid = SuperfluidRenormalization()
+        self.stability_gate = HorizonStabilityGate(kerr_params)
+        
+        # Physical parameters
+        self.gamma_lin = 1.3e-6 * (1.0 / kerr_params.M)
+        self.damping_coeff = 1.8e-11 * (1.0 / kerr_params.M**2)
+        self.hawking_coeff = 1.0 / (kerr_params.M**3) if use_hawking else 0.0
+        
+    def evolution_equation(self, t: float, Gamma: float) -> float:
+        """Complete evolution equation with all effects"""
+        # Linear superradiant growth (renormalized)
+        growth = self.gamma_lin * Gamma
+        growth *= self.superfluid.renormalized_growth_rate(Gamma, self.params.M)
+        
+        # Nonlinear saturation
+        damping = self.damping_coeff * Gamma**3
+        
+        # Hawking evaporation
+        hawking_loss = self.hawking_coeff * Gamma if self.use_hawking else 0.0
+        
+        # Quantum thermostat control
+        dGamma_dt_naive = growth - damping - hawking_loss
+        control_signal = self.thermostat.control_signal(Gamma, dGamma_dt_naive, 1.0)  # dt=1 for ODE
+        
+        # Apply stability gate
+        dGamma_dt = dGamma_dt_naive - control_signal
+        dGamma_dt = self.stability_gate.apply_stability_gate(Gamma, dGamma_dt, 1.0)
+        
+        # Quantum backreaction
+        quantum_correction = self.superfluid.quantum_backreaction(Gamma, dGamma_dt, self.params.M)
+        dGamma_dt *= quantum_correction
+        
+        return dGamma_dt
+    
+    def simulate(self, t_span: tuple, Gamma0: float = 1.0, n_points: int = 10000):
+        """Run complete simulation"""
+        t_eval = np.linspace(t_span[0], t_span[1], n_points)
+        
+        solution = solve_ivp(
+            self.evolution_equation,
+            t_span,
+            [Gamma0],
+            t_eval=t_eval,
+            method='RK45',
+            rtol=1e-8,
+            atol=1e-10
+        )
+        
+        return solution.t, solution.y[0]
+
+def analyze_ctc_window(t: np.ndarray, Gamma: np.ndarray, ctc_threshold: float = 1.02):
+    """Analyze CTC formation window"""
+    ctc_mask = Gamma > ctc_threshold
+    ctc_times = t[ctc_mask]
+    
+    if len(ctc_times) == 0:
+        return 0.0, 0.0, 0.0
+    
+    ctc_start = ctc_times[0]
+    ctc_end = ctc_times[-1]
+    ctc_duration = ctc_end - ctc_start
+    
+    return ctc_start, ctc_end, ctc_duration
+
+def plot_comprehensive_results(t: np.ndarray, Gamma: np.ndarray, params: KerrParameters, 
+                             use_hawking: bool, ctc_threshold: float = 1.02):
+    """Create comprehensive visualization"""
+    fig, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2, 2, figsize=(15, 12))
+    
+    # Main evolution
+    ax1.plot(t, Gamma, 'teal', lw=2, label='Γ(t)')
+    ax1.axhline(ctc_threshold, color='orange', linestyle='--', alpha=0.7, label='CTC threshold')
+    ax1.fill_between(t, ctc_threshold, Gamma, where=(Gamma > ctc_threshold), 
+                    alpha=0.2, color='purple', label='CTC window')
+    ax1.set_ylabel('Frame-dragging amplification Γ(t)')
+    ax1.set_title(f'Bollinger Cloud Evolution\nM={params.M:.2e}, a={params.a}')
+    ax1.legend()
+    ax1.grid(alpha=0.3)
+    
+    # Rate analysis
+    dGamma_dt = np.gradient(Gamma, t)
+    ax2.plot(t, dGamma_dt, 'crimson', lw=1.5, label='dΓ/dt')
+    ax2.axhline(0, color='black', linestyle='-', alpha=0.5)
+    ax2.set_ylabel('Growth rate dΓ/dt')
+    ax2.set_title('Evolution Rate Analysis')
+    ax2.legend()
+    ax2.grid(alpha=0.3)
+    
+    # Phase space
+    ax3.plot(Gamma, dGamma_dt, 'navy', lw=1.5, alpha=0.7)
+    ax3.set_xlabel('Γ')
+    ax3.set_ylabel('dΓ/dt')
+    ax3.set_title('Phase Space Trajectory')
+    ax3.axhline(0, color='black', linestyle='-', alpha=0.5)
+    ax3.axvline(ctc_threshold, color='orange', linestyle='--', alpha=0.7)
+    ax3.grid(alpha=0.3)
+    
+    # Stability analysis
+    stability_gate = HorizonStabilityGate(params)
+    deformations = [stability_gate.horizon_deformation(g) for g in Gamma]
+    ax4.plot(t, deformations, 'darkgreen', lw=1.5, label='Horizon deformation')
+    ax4.axhline(stability_gate.stability_threshold, color='red', linestyle='--', 
+               label='Stability threshold')
+    ax4.set_xlabel('Time [s]' if use_hawking else 'Time [M]')
+    ax4.set_ylabel('Horizon Deformation')
+    ax4.set_title('Horizon Stability Analysis')
+    ax4.legend()
+    ax4.grid(alpha=0.3)
+    
+    plt.tight_layout()
+    return fig
+
+# Example usage and test cases
+if __name__ == "__main__":
+    print("Bollinger-Kerr Drive Advanced Simulator")
+    print("=" * 50)
+    
+    # Test case 1: Stellar engine
+    print("\n1. Testing STELLAR ENGINE mode...")
+    stellar_params = KerrParameters(M=1.0, a=0.998)
+    stellar_sim = BollingerCloudSimulator(stellar_params, use_hawking=False)
+    t_stellar, Gamma_stellar = stellar_sim.simulate((0, 2.5e6), Gamma0=1.0)
+    
+    ctc_start, ctc_end, ctc_duration = analyze_ctc_window(t_stellar, Gamma_stellar)
+    print(f"   Peak Γ: {np.max(Gamma_stellar):.1f}")
+    print(f"   CTC duration: {ctc_duration:.2e} M")
+    
+    # Test case 2: Primordial firecracker  
+    print("\n2. Testing PRIMORDIAL FIRECRACKER mode...")
+    primordial_params = KerrParameters(M=5e-8, a=0.998)
+    primordial_sim = BollingerCloudSimulator(primordial_params, use_hawking=True)
+    t_primordial, Gamma_primordial = primordial_sim.simulate((0, 1.0), Gamma0=1.0, n_points=50000)
+    
+    ctc_start, ctc_end, ctc_duration = analyze_ctc_window(t_primordial, Gamma_primordial)
+    print(f"   Peak Γ: {np.max(Gamma_primordial):.1f}")
+    print(f"   CTC duration: {ctc_duration:.2e} s")
+    
+    # Generate plots
+    fig_stellar = plot_comprehensive_results(t_stellar, Gamma_stellar, stellar_params, False)
+    fig_stellar.savefig('stellar_engine_advanced.png', dpi=300, bbox_inches='tight')
+    
+    fig_primordial = plot_comprehensive_results(t_primordial, Gamma_primordial, primordial_params, True)
+    fig_primordial.savefig('primordial_firecracker_advanced.png', dpi=300, bbox_inches='tight')
+    
+    print("\nSimulation complete. Results saved to PNG files.")
+    print("\nKey features implemented:")
+    print("✅ Quantum thermostat with phase-slip feedback")
+    print("✅ Superfluid renormalization for quantum corrections") 
+    print("✅ Horizon stability gate (Min-Gate)")
+    print("✅ Comprehensive stability analysis")
+    print("✅ Adaptive control preserving physical constraints")
