@@ -31,3 +31,7 @@ We treat this as a scientific exploration not a foregone conclusion. Each step:
     Stress-test against known physics
 
     Document both successes and failures
+
+📝 Note on the 10.3 MHz Frequency: The value of 10.3 MHz is currently a heuristic variable derived from intuitive modeling of the superfluid phase transition scale. It serves as a placeholder target for the search algorithm.
+
+The logic of the equation holds regardless of the specific frequency: If a resonance signal (ωres​) is detected, then the feed (Sfeed​) modulates. Challenge to the Community: Calculate the actual derivation of the Second Sound resonance frequency for macroscopic vacuum condensate.
