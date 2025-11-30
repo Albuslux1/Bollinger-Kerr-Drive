@@ -158,6 +158,8 @@ The framework is ready - now we need the community's mathematical firepower to d
 Research Frontier: Investigating Higher-Order Topological Phases (inspired by Pan Jianwei) to extend field coherence times from milliseconds to years.11-29-2025
 
 <img width="1600" height="914" alt="bollinger_kerr_tech_tree png" src="https://github.com/user-attachments/assets/a1768603-fe24-410b-b8d4-09614b47507c" />
+****ENTROPY ACCOUNTING****
+<img width="1600" height="1333" alt="bollinger_kerr_entropy_economics png" src="https://github.com/user-attachments/assets/e8b74779-8ff6-46ef-ba04-59bacd06dea7" />
 
 ![Possible Bollinger-Kerr-Drive-Ship](https://github.com/user-attachments/assets/9feefedf-7436-4e6d-a158-fe99f29f3b09)
 
