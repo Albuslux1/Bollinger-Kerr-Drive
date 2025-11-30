@@ -159,4 +159,6 @@ Research Frontier: Investigating Higher-Order Topological Phases (inspired by Pa
 
 <img width="1600" height="914" alt="bollinger_kerr_tech_tree png" src="https://github.com/user-attachments/assets/a1768603-fe24-410b-b8d4-09614b47507c" />
 
+![Possible Bollinger-Kerr-Drive-Ship](https://github.com/user-attachments/assets/9feefedf-7436-4e6d-a158-fe99f29f3b09)
 
+![Fully Stable Bollinger-Kerr-Drive reactor](https://github.com/user-attachments/assets/6da4588d-bf17-445c-aad0-7a1cc878becf)
