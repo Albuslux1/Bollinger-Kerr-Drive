@@ -156,11 +156,15 @@ We need mathematical derivations proving u₂ can reach relativistic speeds (0.0
 
 The framework is ready - now we need the community's mathematical firepower to derive the u₂ that gets us to 1.0 efficiency!
 Research Frontier: Investigating Higher-Order Topological Phases (inspired by Pan Jianwei) to extend field coherence times from milliseconds to years.11-29-2025
+
 ****TECH UNLOCK TREE****
-<img width="1600" height="914" alt="bollinger_kerr_tech_tree png" src="https://github.com/user-attachments/assets/a1768603-fe24-410b-b8d4-09614b47507c" />
+
+<img width="1600" height="914" alt="Tech Tree V12 Bollinger-Kerr" src="https://github.com/user-attachments/assets/3362b2cb-f504-4abc-9562-b74ab936dd4e" />
+
 ****ENTROPY ACCOUNTING****
 
 <img width="1600" height="1333" alt="bollinger_kerr_entropy_economics png" src="https://github.com/user-attachments/assets/e8b74779-8ff6-46ef-ba04-59bacd06dea7" />
+
 ****OUR FUTURE SHIP****
 
 ![Possible Bollinger-Kerr-Drive-Ship](https://github.com/user-attachments/assets/9feefedf-7436-4e6d-a158-fe99f29f3b09)
@@ -168,3 +172,13 @@ Research Frontier: Investigating Higher-Order Topological Phases (inspired by Pa
 ****FULLY STABLE BOLLINGER-KERR REACTOR****
 
 ![Fully Stable Bollinger-Kerr-Drive reactor](https://github.com/user-attachments/assets/6da4588d-bf17-445c-aad0-7a1cc878becf)
+
+****WARP DRIVE ENGINE PROTOTYPE****
+
+![Bollinger-Kerr-Drive prototype](https://github.com/user-attachments/assets/9e1fbcf7-a7e2-48dc-9586-c23141ff1932)
+
+****INSIDE OF REACTOR****
+
+![Inside of reactor](https://github.com/user-attachments/assets/4d6a994a-de43-40bc-961e-20a4de9a87b1)
+
+
