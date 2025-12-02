@@ -159,7 +159,8 @@ Research Frontier: Investigating Higher-Order Topological Phases (inspired by Pa
 
 ****TECH UNLOCK TREE****
 
-<img width="1600" height="914" alt="Tech Tree V12 Bollinger-Kerr" src="https://github.com/user-attachments/assets/3362b2cb-f504-4abc-9562-b74ab936dd4e" />
+<img width="1600" height="914" alt="bollinger_kerr_tech_tree_v13 png" src="https://github.com/user-attachments/assets/d21f2e9a-3f70-4c93-97a4-d1c9a7944318" />
+
 
 ****ENTROPY ACCOUNTING****
 
