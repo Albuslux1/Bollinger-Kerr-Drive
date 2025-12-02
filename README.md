@@ -196,3 +196,5 @@ https://github.com/Albuslux1/AGI-Protocol-v1.0
 https://github.com/Albuslux1/RAPL-Nuclear-Nutrient-Cycle
 
 Build the Mind. Feed the Body. Reach the Stars. 
+
+https://thexperiment.tiiny.site
