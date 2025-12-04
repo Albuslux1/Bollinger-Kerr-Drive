@@ -12,7 +12,7 @@
 
 ## 🚀 MAJOR BREAKTHROUGH: 10x Vortex Boost Path to FTL Threshold
 
-**December 2024**: New simulations identify the direct pathway to achieving stable virtual horizon formation (C ≥ 2.5). **A 10x vortex amplification boost brings coherence from C = 1.53 → 2.73, crossing the FTL threshold using existing target parameters.**
+**December 2025**: New simulations identify the direct pathway to achieving stable virtual horizon formation (C ≥ 2.5). **A 10x vortex amplification boost brings coherence from C = 1.53 → 2.73, crossing the FTL threshold using existing target parameters.**
 
 [Jump to breakthrough details ↓](#breakthrough-10x-vortex-boost-pathway)
 
