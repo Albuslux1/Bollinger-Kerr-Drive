@@ -117,10 +117,56 @@ We treat this as a scientific exploration not a foregone conclusion. Each step:
 
     Document both successes and failures
 
-📝 Note on the 10.3 MHz Frequency: The value of 10.3 MHz is currently a heuristic variable derived from intuitive modeling of the superfluid phase transition scale. It serves as a placeholder target for the search algorithm.
+📝 Note on Frequency Specifications
+The BKD system operates at two different frequency scales serving different purposes:
+1. Cavity Resonance Frequency: 3.43 PHz (PetaHertz)
+
+This is the standing wave frequency that determines cavity gap size
+Gap size: a = c/(2f) = 43.7 nm
+This frequency appears in all coherence calculations
+This is what the simulation models
+
+2. Bollinger Field Modulation: 10.3 MHz (under investigation)
+
+This is the hypothesized oscillation frequency of the scalar field perturbations
+Bollinger field: φ ~ e^(iωt) sin(kr) cos(ℓθ)
+This ω (omega) may be in the MHz range
+Currently a heuristic placeholder - needs derivation from first principles
+
+Critical distinction: The PHz frequency creates the cavity geometry. The MHz frequency (if validated) would be the rate at which the Bollinger field oscillates within that cavity.
+What Needs Derivation:
+
+ Second sound resonance frequency for macroscopic vacuum condensate
+ Relationship between cavity frequency (PHz) and field modulation (MHz?)
+ Whether MHz modulation is correct or if it should scale with cavity frequency
+
+Community challenge: Calculate the actual resonance frequencies from quantum vortex theory and vacuum condensate hydrodynamics.
 
 The logic of the equation holds regardless of the specific frequency: If a resonance signal (ωres​) is detected, then the feed (Sfeed​) modulates. Challenge to the Community: Calculate the actual derivation of the Second Sound resonance frequency for macroscopic vacuum condensate.
 Simulation confirms that 10.3 MHz resonance at macroscopic scales requires wave velocities u2​>105 m/s. This excludes standard condensed matter and points to a relativistic vacuum condensate as the active medium.
+📝 Note on the 10.3 MHz Frequency
+The value of 10.3 MHz is currently a heuristic variable derived from intuitive modeling of the superfluid phase transition scale. It represents the hypothesized second sound resonance frequency in the vacuum condensate medium, not the cavity standing wave frequency.
+Two Distinct Frequencies in BKD:
+
+Cavity Resonance: 3.43 PHz (determines gap geometry)
+
+Standing wave: a = c/(2f) = 43.7 nm
+This is what creates the physical cavity structure
+Used in all coherence calculations in the simulation
+
+
+Second Sound Oscillations: ~10.3 MHz (density waves in medium)
+
+Bollinger field modulation: φ ~ e^(iωt)
+This is the rate at which the vacuum condensate oscillates
+Currently a placeholder pending rigorous derivation
+
+
+
+The logic of the equation holds regardless of the specific frequency: If a resonance signal (ωres) is detected, then the feed (Sfeed) modulates.
+Challenge to the Community: Calculate the actual derivation of the Second Sound resonance frequency for macroscopic vacuum condensate.
+What the simulation confirms: 10.3 MHz resonance at macroscopic scales requires wave velocities u₂ > 10⁵ m/s. This excludes standard condensed matter (where sound speeds are ~10³ m/s) and points to a relativistic vacuum condensate as the active medium.
+Critical bottleneck: We need u₂ ≈ 6×10⁵ m/s to achieve 10x vortex boost. This is why deriving the actual second sound velocity from first principles is essential.
 
 ***BOTTLENECK CONFIRMED: Damping Coefficient***
 
