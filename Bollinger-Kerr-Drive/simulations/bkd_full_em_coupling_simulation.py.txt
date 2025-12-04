@@ -1,0 +1,286 @@
+#!/usr/bin/env python3
+# bkd_full_em_coupling_simulation_v2.py
+# December 2025 — BKD EM Coupling (Standard Physics vs BKD Speculative Mode)
+#
+# This script:
+#   - Uses realistic EM effects (Schwinger + plasma with losses)
+#   - Treats EM as the mechanism that boosts the vortex multiplier
+#   - Separates "Standard Physics" from "BKD speculative" behavior
+#   - Fixes time units and makes the C → γ mapping explicitly toy-model
+
+import numpy as np
+import matplotlib.pyplot as plt
+from scipy.constants import epsilon_0, pi
+
+# ==================== BASE PARAMETERS (2026–2028 hardware) ====================
+
+f_PHz = 3.43                # Frequency in PHz
+Q = 1.5e9                   # Quality factor (diamond/AlN target)
+gap_nm = 43.7               # Standing wave gap (nm)
+plasma_density_cm3 = 1e18   # n-type doping level (cm^-3)
+stored_energy_pJ = 1.0      # Stored energy scale per mode (pJ)
+distance_ly = 40000         # Trip distance (light-years), ~Milky Way scale
+
+# NOTE:
+# In this v2 model, we treat vortex boosting as:
+#   - 1×   = baseline (no EM help)
+#   - Standard EM mode tries to compute a physical boost from EM effects
+#   - BKD speculative mode assumes EM + topology etc. let us reach 10× vortex boost
+
+# =====================================================================
+#   REALISTIC EM HELPERS (from your enhanced physics script)
+# =====================================================================
+
+def calculate_realistic_schwinger_boost(E_field_Vm):
+    """
+    More physically conservative Schwinger pair-production boost.
+    Uses WKB tunneling probability; caps boost at 10×.
+    For E << 0.05 E_s, returns ~1× (negligible).
+    """
+    E_schwinger = 1.3e18  # V/m
+
+    if E_field_Vm < 0.05 * E_schwinger:
+        return 1.0  # negligible
+
+    # WKB tunneling probability approximation
+    tunneling_prob = np.exp(-np.pi * E_schwinger / E_field_Vm)
+
+    max_boost = 10.0
+    boost = 1 + (max_boost - 1) * (1 - tunneling_prob)
+    return min(boost, max_boost)
+
+
+def calculate_plasma_boost_with_losses(omega, plasma_density_cm3):
+    """
+    Plasma boost including collision losses and skin depth effects.
+
+    omega            : angular frequency of the driving field [rad/s]
+    plasma_density_cm3 : electron density in cm^-3 (standard plasma formula)
+
+    Returns:
+        boost     : modest O(1) factor from plasma contribution
+        Q_plasma  : effective quality factor of plasma oscillations
+    """
+    # Standard plasma frequency formula in rad/s with density in cm^-3
+    omega_p = 5.64e4 * np.sqrt(plasma_density_cm3)
+
+    # Collision frequency (empirical for good doped diamond, ~100 fs)
+    tau = 100e-15  # s
+    nu_c = 1.0 / tau
+
+    # Drude model with collisions
+    epsilon_r = 1 - omega_p**2 / (omega**2 + 1j * omega * nu_c)
+
+    # Quality factor: ratio of imaginary to real part magnitude
+    if np.real(epsilon_r) != 0:
+        Q_plasma = np.abs(np.imag(epsilon_r) / np.real(epsilon_r))
+    else:
+        Q_plasma = 0.0
+
+    # Effective boost: modest enhancement limited by collisions
+    boost = 1 + 0.5 * (omega_p / omega)**2 / (1 + (nu_c / omega)**2)
+
+    return boost, Q_plasma
+
+# =====================================================================
+#   CORE BKD COHERENCE MODEL
+# =====================================================================
+
+def base_photonic_coherence(f_PHz, Q, vortex_mult):
+    """
+    Baseline photonic coherence model (your original phenomenological formula).
+    C increases with Q, frequency, and vortex multiplier.
+    """
+    C = (np.exp(-0.08 / Q**0.09) *
+         (Q / (Q + 1e9))**0.95 *
+         f_PHz**0.75 *
+         vortex_mult**0.25)
+    return C
+
+
+def effective_vortex_multiplier_standard(f_PHz, Q, gap_nm, plasma_density_cm3,
+                                         stored_energy_pJ):
+    """
+    STANDARD PHYSICS MODE:
+    Computes an effective vortex multiplier from realistic EM effects.
+    This will usually be O(1)–few×, not 10×.
+
+    Returns:
+        vortex_eff : effective vortex multiplier to feed into base_photonic_coherence
+        details    : dict with intermediate quantities
+    """
+    omega = 2 * pi * f_PHz * 1e15
+
+    # Mode volume ~ cube of gap (very rough)
+    mode_volume = (gap_nm * 1e-9)**3  # m^3
+
+    # Stored energy scale (J); we multiply by Q to represent energy build-up
+    stored_energy_J = stored_energy_pJ * 1e-12 * Q
+
+    # RMS electric field estimate in the mode
+    E_field = np.sqrt(2 * stored_energy_J / (epsilon_0 * mode_volume))
+
+    # Realistic boosts
+    schwinger_boost = calculate_realistic_schwinger_boost(E_field)
+    plasma_boost, Q_plasma = calculate_plasma_boost_with_losses(omega, plasma_density_cm3)
+
+    # Combined EM factor; capped moderately for standard physics mode
+    em_factor = schwinger_boost * plasma_boost
+    em_factor_capped = min(em_factor, 3.0)  # be conservative in standard mode
+
+    vortex_eff = 1.0 * em_factor_capped
+
+    details = {
+        "E_field_Vm": E_field,
+        "schwinger_boost": schwinger_boost,
+        "plasma_boost": plasma_boost,
+        "Q_plasma": Q_plasma,
+        "em_factor_raw": em_factor,
+        "em_factor_capped": em_factor_capped
+    }
+    return vortex_eff, details
+
+
+def effective_vortex_multiplier_bkd_speculative():
+    """
+    BKD SPECULATIVE MODE:
+    Here we just assume the combined effect of EM structuring, topology,
+    vortex engineering etc. allows us to reach a ~10× vortex boost.
+
+    This is explicitly *beyond* standard QED/materials assumptions.
+    """
+    return 10.0
+
+# =====================================================================
+#   C → γ MAPPING AND TRAVEL TIME (TOY MODEL)
+# =====================================================================
+
+def coherence_to_gamma(C):
+    """
+    TOY MAPPING:
+    In this BKD phenomenological model, we map coherence to an effective
+    "warp factor" γ via:
+
+        γ = sqrt(C)
+
+    This is NOT a GR derivation; it's a heuristic linking higher coherence
+    to stronger time-dilation suppression / shortcut efficiency.
+    """
+    return np.sqrt(C)
+
+
+def travel_stats(distance_ly, C):
+    """
+    Compute coordinate and crew times in this toy BKD model.
+
+    distance_ly : distance in light-years
+    C           : coherence value (dimensionless)
+
+    We use:
+        t_coord_years = distance_ly / C
+        gamma         = sqrt(C)
+        t_crew_years  = t_coord_years / gamma
+
+    Returns:
+        gamma, t_coord_years, t_crew_years
+    """
+    gamma = coherence_to_gamma(C)
+    t_coord_years = distance_ly / C
+    t_crew_years = t_coord_years / gamma
+    return gamma, t_coord_years, t_crew_years
+
+# =====================================================================
+#   MAIN ANALYSIS
+# =====================================================================
+
+def main():
+    print("BOLLINGER-KERR DRIVE — FULL EM COUPLING SIMULATION (v2)")
+    print("=" * 72)
+    print(f"Frequency          : {f_PHz} PHz")
+    print(f"Q-factor           : {Q:.2e}")
+    print(f"Gap size           : {gap_nm} nm")
+    print(f"Plasma density     : {plasma_density_cm3:.1e} cm⁻³")
+    print(f"Stored energy scale: {stored_energy_pJ} pJ per mode")
+    print(f"Trip distance      : {distance_ly} light-years")
+    print("=" * 72)
+
+    # 1) Baseline: photonic only, vortex = 1
+    C_baseline = base_photonic_coherence(f_PHz, Q, vortex_mult=1.0)
+    gamma_base, t_coord_base, t_crew_base = travel_stats(distance_ly, C_baseline)
+
+    # 2) Standard physics EM mode: realistic vortex multiplier from EM
+    vortex_std, em_details = effective_vortex_multiplier_standard(
+        f_PHz, Q, gap_nm, plasma_density_cm3, stored_energy_pJ
+    )
+    C_std = base_photonic_coherence(f_PHz, Q, vortex_mult=vortex_std)
+    gamma_std, t_coord_std, t_crew_std = travel_stats(distance_ly, C_std)
+
+    # 3) BKD speculative mode: assume we achieve full 10× vortex boost
+    vortex_bkd = effective_vortex_multiplier_bkd_speculative()
+    C_bkd = base_photonic_coherence(f_PHz, Q, vortex_mult=vortex_bkd)
+    gamma_bkd, t_coord_bkd, t_crew_bkd = travel_stats(distance_ly, C_bkd)
+
+    # ---------------- PRINT SUMMARY ----------------
+    print("\n=== VORTEX MULTIPLIERS ===")
+    print(f"Baseline vortex multiplier       : 1.0×")
+    print(f"Standard EM effective multiplier : {vortex_std:.2f}×")
+    print(f"BKD speculative multiplier       : {vortex_bkd:.1f}×")
+    print("\n=== EM DETAILS (Standard Physics Mode) ===")
+    print(f"  E_field        : {em_details['E_field_Vm']:.2e} V/m")
+    print(f"  Schwinger boost: {em_details['schwinger_boost']:.2f}×")
+    print(f"  Plasma boost   : {em_details['plasma_boost']:.2f}× (Q_plasma ~ {em_details['Q_plasma']:.1f})")
+    print(f"  EM factor (raw): {em_details['em_factor_raw']:.2f}× → capped to {em_details['em_factor_capped']:.2f}×")
+
+    print("\n=== COHERENCE & WARP FACTOR (γ) ===")
+    print(f"Baseline      : C = {C_baseline:.3f}, γ = {gamma_base:.3f}")
+    print(f"Standard EM   : C = {C_std:.3f}, γ = {gamma_std:.3f}")
+    print(f"BKD Speculative (10×): C = {C_bkd:.3f}, γ = {gamma_bkd:.3f}")
+
+    print("\n=== TRAVEL TIMES FOR 40,000 ly (Toy BKD Model) ===")
+    def report(label, C, gamma, t_coord, t_crew):
+        print(f"{label}:")
+        print(f"  Coherence C         : {C:.3f}")
+        print(f"  Effective γ         : {gamma:.3f}")
+        print(f"  Coord. time         : {t_coord:,.1f} years")
+        print(f"  Crew time           : {t_crew:,.1f} years ({t_crew*365:,.1f} days)")
+        print()
+
+    report("Baseline (vortex = 1×)", C_baseline, gamma_base, t_coord_base, t_crew_base)
+    report("Standard EM mode", C_std, gamma_std, t_coord_std, t_crew_std)
+    report("BKD Speculative (10× vortex)", C_bkd, gamma_bkd, t_coord_bkd, t_crew_bkd)
+
+    print("=" * 72)
+    print("NOTE:")
+    print("  - 'Standard EM mode' stays within conservative QED/material assumptions.")
+    print("  - 'BKD Speculative' assumes EM + topology etc. truly achieve 10× vortex boost.")
+    print("  - The C→γ and time mappings are heuristic, not GR derivations.")
+    print("=" * 72)
+
+    # ---------------- SIMPLE PLOT ----------------
+    labels = ["Baseline", "Standard EM", "BKD (10×)"]
+    C_vals = [C_baseline, C_std, C_bkd]
+    gamma_vals = [gamma_base, gamma_std, gamma_bkd]
+
+    fig, ax1 = plt.subplots(figsize=(9, 6))
+    bars = ax1.bar(labels, C_vals, color=['#00ddff', '#ffaa00', '#ff00aa'], alpha=0.8)
+    ax1.set_ylabel('Coherence C', fontsize=13, color='#00ddff')
+    ax1.tick_params(axis='y', labelcolor='#00ddff')
+
+    ax2 = ax1.twinx()
+    ax2.plot(labels, gamma_vals, 'o-', color='white', markersize=10, linewidth=2)
+    ax2.set_ylabel('Effective Warp Factor γ (toy)', fontsize=13, color='white')
+    ax2.tick_params(axis='y', labelcolor='white')
+
+    plt.title('BKD Coherence & Effective Warp Factor\n'
+              '(Baseline vs Standard EM vs BKD Speculative 10×)', fontsize=14, color='white')
+    fig.patch.set_facecolor('black')
+    ax1.set_facecolor('black')
+    for spine in ['top', 'bottom', 'left', 'right']:
+        ax1.spines[spine].set_color('white')
+    ax1.tick_params(colors='white')
+    plt.tight_layout()
+    plt.savefig('bkd_em_coupling_v2.png', dpi=200, facecolor='black')
+    # plt.show()  # Uncomment locally if you want to see the plot window
+
+if __name__ == "__main__":
+    main()
