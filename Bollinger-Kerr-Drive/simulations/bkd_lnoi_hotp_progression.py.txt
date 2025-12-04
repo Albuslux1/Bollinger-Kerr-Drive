@@ -1,0 +1,278 @@
+"""
+BKD + HOTP + LNOI Progression Simulation
+========================================
+
+This script compresses the last three conceptual steps into a single
+numerical toy model:
+
+1. Single higher-order topological (HOTP) cavity
+   - Chern numbers 1–4
+   - Q from 1e8 → 1e10
+   - Computes topological coherence C_topo
+
+2. BKD coherence with vortex boost
+   - Maps C_topo → vortex boost via an exponential scaling
+   - Then maps boost → BKD coherence C_BKD with a 1/4 power law
+   - FTL threshold at C_BKD ≥ 2.5
+
+3. Array scaling and decoherence
+   - Shows how C_BKD degrades (or survives) as we increase the number
+     of coupled cavities N
+   - Compares a naive (unmitigated) array vs a "HOTP + LNOI + cryo +
+     EO-tuned" mitigated array.
+
+This is not a fit to any particular experiment; it's a compact,
+transparent visualization of the progression of ideas:
+EM tricks fail → higher-order topology + high Q works in sim →
+arrays need protection + tunability to preserve coherence.
+"""
+
+import numpy as np
+import matplotlib.pyplot as plt
+
+# -----------------------------
+# Global BKD parameters
+# -----------------------------
+
+C_BASE_BKD = 1.533     # Baseline BKD coherence without vortex boost
+C_FTL = 2.5            # "FTL stability" threshold in the BKD model
+
+
+# -----------------------------
+# 1. Higher-order topological coherence
+# -----------------------------
+
+def higher_order_coherence(chern, Q_factor, temperature_K=4.0):
+    """
+    Phenomenological model for topological coherence C_topo(chern, Q, T).
+
+    - Q_ref ~ 1e8 sets the scale where conventional losses stop dominating.
+    - Higher Chern numbers get an extra "protection" factor.
+    - Temperature dependence is mild near 4 K.
+
+    Returns:
+        C_topo in [0, 0.995]
+    """
+    Q_ref = 1e8
+    # Base coherence from Q (bounded below 1)
+    C_base = Q_factor / (Q_factor + Q_ref)
+
+    # Extra protection from higher-order topology (Chern ≥ 2)
+    if chern >= 2:
+        protection = 1.0 + 0.15 * (chern - 1) ** 1.5
+    else:
+        protection = 1.0
+
+    # Temperature robustness (simple, gentle scaling)
+    T_ref = 4.0
+    thermal_factor = 1.0 - 0.1 * ((temperature_K / T_ref) - 1.0) / max(chern, 1)
+    thermal_factor = max(0.1, min(1.0, thermal_factor))
+
+    C_topo = C_base * protection * thermal_factor
+    # Cap slightly below 1 to avoid divergences
+    return min(C_topo, 0.995)
+
+
+# -----------------------------
+# 2. Topology → vortex boost → BKD coherence
+# -----------------------------
+
+def topology_to_vortex_boost(C_topo, lambda_scale=0.10):
+    """
+    Map topological coherence → vortex amplification factor.
+
+    - Below C_topo = 0.5: no effective boost (1x).
+    - Above 0.5: exponential growth with scale lambda_scale.
+
+    Calibrated so that:
+        C_topo ≈ 0.73  →  ~10x
+        C_topo ≈ 0.95  →  ~90x
+        C_topo ≈ 0.995 → ~140–150x
+    """
+    if C_topo < 0.5:
+        return 1.0
+    return float(np.exp((C_topo - 0.5) / lambda_scale))
+
+
+def bkd_coherence_from_boost(vortex_boost, C_base=C_BASE_BKD):
+    """
+    Convert vortex boost factor → BKD coherence.
+
+    Uses the 1/4 power law from the BKD sims:
+        C_BKD = C_base * boost^(1/4)
+    """
+    return float(C_base * vortex_boost ** 0.25)
+
+
+# -----------------------------
+# 3. Array scaling & decoherence
+# -----------------------------
+
+def array_stability_factor(N, mode="naive"):
+    """
+    Phenomenological stability factor for an array of N cavities.
+
+    mode = "naive":
+        - Linear "tax" per additional cavity
+        - Represents disorder, uncontrolled cross-talk, phase drift, etc.
+
+    mode = "mitigated":
+        - Much gentler degradation vs sqrt(N)
+        - Represents HOTP protection + LNOI + cryo + EO tuning
+
+    Returns:
+        factor in (0, 1], multiplied into C_BKD_single to get C_array.
+    """
+    N = max(int(N), 1)
+
+    if mode == "naive":
+        alpha = 0.02   # decoherence per additional cavity (aggressive)
+        return 1.0 / (1.0 + alpha * (N - 1))
+    else:
+        beta = 0.005   # slower decoherence vs sqrt(N) (mitigated)
+        return 1.0 / (1.0 + beta * np.sqrt(N - 1))
+
+
+def effective_array_coherence(C_single, N, mode="naive"):
+    """
+    Compute effective BKD coherence for an array of N cavities.
+
+    C_array = C_single * array_stability_factor(N, mode)
+    """
+    return C_single * array_stability_factor(N, mode)
+
+
+# -----------------------------
+# Progression driver
+# -----------------------------
+
+def run_progression():
+    print("=" * 72)
+    print("BKD + HOTP + LNOI PROGRESSION SIMULATION")
+    print("=" * 72)
+    print("\nStage 1: Single HOTP cavity (Chern = 1–4, Q = 1e8 → 1e10)\n")
+
+    chern_values = [1, 2, 3, 4]
+    Q_values = [1e8, 1e9, 1e10]
+
+    for Q in Q_values:
+        print(f"Q = {Q:.1e}")
+        for ch in chern_values:
+            C_topo = higher_order_coherence(ch, Q, temperature_K=4.0)
+            boost = topology_to_vortex_boost(C_topo)
+            C_bkd = bkd_coherence_from_boost(boost)
+            status = "✓ FTL" if C_bkd >= C_FTL else "– sub-threshold"
+            print(
+                f"  Chern={ch}: C_topo={C_topo:5.3f}, "
+                f"boost={boost:7.2f}x, C_BKD={C_bkd:5.2f}  {status}"
+            )
+        print()
+
+    # Highlight the hero point: Chern=3, Q=1e10, T=4 K
+    ch_hero, Q_hero = 3, 1e10
+    C_topo_hero = higher_order_coherence(ch_hero, Q_hero)
+    boost_hero = topology_to_vortex_boost(C_topo_hero)
+    C_bkd_hero = bkd_coherence_from_boost(boost_hero)
+
+    print("=" * 72)
+    print("Stage 2: LiNbO3-on-insulator HOTP + high Q (hero point)")
+    print("=" * 72)
+    print(
+        f"\nHero configuration (inspired by LNOI HOTP corner states):\n"
+        f"  Chern      = {ch_hero}\n"
+        f"  Q          = {Q_hero:.1e}\n"
+        f"  T          = 4 K (cryo)\n"
+        f"  C_topo     = {C_topo_hero:.3f}\n"
+        f"  vortex boost ≈ {boost_hero:.1f}x\n"
+        f"  C_BKD      = {C_bkd_hero:.2f}  "
+        f"{'✓ deep FTL regime' if C_bkd_hero >= C_FTL else 'sub-threshold'}\n"
+    )
+
+    print("=" * 72)
+    print("Stage 3: Array scaling and decoherence (N cavities)")
+    print("=" * 72)
+
+    N_values = [1, 4, 16, 64, 100]
+    print("\nUsing hero single-cavity value C_BKD_single "
+          f"= {C_bkd_hero:.2f} at Chern=3, Q=1e10\n")
+
+    print(f"{'N':>5}  {'Mode':>10}  {'C_array':>10}  {'Status':>15}")
+    print("-" * 50)
+    for N in N_values:
+        for mode in ["naive", "mitigated"]:
+            C_arr = effective_array_coherence(C_bkd_hero, N, mode)
+            status = "✓ FTL" if C_arr >= C_FTL else "– drops below FTL"
+            print(
+                f"{N:5d}  {mode:>10}  {C_arr:10.3f}  {status:>15}"
+            )
+    print("-" * 50)
+    print("\nNaive arrays lose FTL coherence at large N,")
+    print("while HOTP + LNOI + cryo + EO-tuned arrays can keep C_array")
+    print("comfortably above the C ≥ 2.5 threshold even for N ~ 100.")
+    print()
+
+    # -----------------------------
+    # Visualization
+    # -----------------------------
+    fig, axes = plt.subplots(1, 3, figsize=(18, 5))
+
+    # Plot 1: C_BKD vs Q for Chern=3
+    Q_scan = np.logspace(8, 10, 100)
+    C_bkd_scan = []
+    for Qs in Q_scan:
+        C_topo = higher_order_coherence(3, Qs)
+        boost = topology_to_vortex_boost(C_topo)
+        C_bkd_scan.append(bkd_coherence_from_boost(boost))
+    axes[0].semilogx(Q_scan, C_bkd_scan, lw=2)
+    axes[0].axhline(C_FTL, color="red", ls="--", label="FTL threshold")
+    axes[0].set_xlabel("Q-factor")
+    axes[0].set_ylabel("C_BKD (Chern=3)")
+    axes[0].set_title("Stage 1 → 2: Q-scaling for HOTP corner state")
+    axes[0].legend()
+    axes[0].grid(True, which="both", alpha=0.3)
+
+    # Plot 2: C_BKD vs Chern at two Q values
+    cherns = np.array(chern_values)
+    C_bkd_Q9 = []
+    C_bkd_Q10 = []
+    for ch in cherns:
+        C_topo_9 = higher_order_coherence(ch, 1e9)
+        C_topo_10 = higher_order_coherence(ch, 1e10)
+        C_bkd_Q9.append(bkd_coherence_from_boost(
+            topology_to_vortex_boost(C_topo_9)
+        ))
+        C_bkd_Q10.append(bkd_coherence_from_boost(
+            topology_to_vortex_boost(C_topo_10)
+        ))
+    axes[1].plot(cherns, C_bkd_Q9, "o-", label="Q = 1e9")
+    axes[1].plot(cherns, C_bkd_Q10, "s-", label="Q = 1e10")
+    axes[1].axhline(C_FTL, color="red", ls="--")
+    axes[1].set_xlabel("Chern number")
+    axes[1].set_ylabel("C_BKD")
+    axes[1].set_title("Topological order vs BKD coherence")
+    axes[1].legend()
+    axes[1].grid(True, alpha=0.3)
+
+    # Plot 3: Array coherence vs N (hero point)
+    N_scan = np.arange(1, 101)
+    C_naive = [effective_array_coherence(C_bkd_hero, N, "naive")
+               for N in N_scan]
+    C_mitigated = [effective_array_coherence(C_bkd_hero, N, "mitigated")
+                   for N in N_scan]
+    axes[2].plot(N_scan, C_naive, label="Naive array", lw=2)
+    axes[2].plot(N_scan, C_mitigated, label="HOTP+LNOI+cryo+EO (mitigated)", lw=2)
+    axes[2].axhline(C_FTL, color="red", ls="--", label="FTL threshold")
+    axes[2].set_xlabel("Number of cavities N")
+    axes[2].set_ylabel("Effective C_array")
+    axes[2].set_title("Stage 3: Array scaling and decoherence")
+    axes[2].legend()
+    axes[2].grid(True, alpha=0.3)
+
+    plt.tight_layout()
+    plt.savefig("bkd_lnoi_hotp_progression.png", dpi=200)
+    plt.show()
+    print("✓ Saved figure: bkd_lnoi_hotp_progression.png")
+
+
+if __name__ == "__main__":
+    run_progression()
