@@ -115,7 +115,8 @@ Recent simulations reveal that **10x vortex amplification** is the most direct p
 
 *Parameter space showing coherence contours across frequency and Q-factor. Cyan line marks C = 2.5 threshold. Target parameters (cyan dot) currently fall below threshold at baseline vortex strength.*
 
-![BKD_FTL_threshold_surface.png](simulations/outputs/BKD_FTL_threshold_surface.png)
+<img width="1895" height="1569" alt="BKD_FTL_threshold_surface" src="https://github.com/user-attachments/assets/557d52df-dae7-4f42-8444-8b68f9522573" />
+
 
 ---
 
@@ -123,7 +124,7 @@ Recent simulations reveal that **10x vortex amplification** is the most direct p
 
 *Testing 0.1x to 1000x vortex boost scenarios. Green dots = above FTL threshold, Red dots = below. Shows 10x boost is minimum to achieve C ≥ 2.5.*
 
-![BKD_vortex_amplification_sweep.png](simulations/outputs/BKD_vortex_amplification_sweep.png)
+<img width="3576" height="2354" alt="BKD_vortex_amplification_sweep" src="https://github.com/user-attachments/assets/c490e0b9-314c-411e-9b0d-2f290ca9e82c" />
 
 ---
 
@@ -131,7 +132,8 @@ Recent simulations reveal that **10x vortex amplification** is the most direct p
 
 *Left: Coherence scales with vortex boost, crossing threshold at 10x. Right: Time dilation suppression becomes significant at C ≥ 2.5 (green FTL zone).*
 
-![BKD_10x_boost_analysis.png](simulations/outputs/BKD_10x_boost_analysis.png)
+<img width="2777" height="1168" alt="BKD_10x_boost_analysis" src="https://github.com/user-attachments/assets/84e15561-59fb-4f48-aa05-5d792f1e09c5" />
+
 
 ---
 
