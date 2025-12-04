@@ -203,6 +203,22 @@ We need mathematical derivations proving u₂ can reach relativistic speeds (0.0
 The framework is ready - now we need the community's mathematical firepower to derive the u₂ that gets us to 1.0 efficiency!
 Research Frontier: Investigating Higher-Order Topological Phases (inspired by Pan Jianwei) to extend field coherence times from milliseconds to years.11-29-2025
 
+****Figure 1: BKD FTL Threshold Surface
+Parameter space showing coherence contours across frequency and Q-factor. Cyan line marks C = 2.5 threshold. Target parameters (cyan dot) currently fall below threshold.****
+
+<img width="1895" height="1569" alt="BKD_FTL_threshold_surface" src="https://github.com/user-attachments/assets/2a70736f-891e-43a7-9c99-887ab7744f37" />
+
+****Figure 2: Vortex Amplification Pathway Analysis
+Testing 0.1x to 1000x vortex boost scenarios. Green dots = above FTL threshold, Red dots = below. Shows 10x boost is minimum to achieve C ≥ 2.5.****
+
+<img width="3576" height="2354" alt="BKD_vortex_amplification_sweep" src="https://github.com/user-attachments/assets/ff4e5976-2872-4699-bc21-6227da0708d7" />
+
+****Figure 3: The 10x Solution
+Left: Coherence scales with vortex boost, crossing threshold at 10x. Right: Time dilation suppression becomes significant at C ≥ 2.5 (green FTL zone).****
+
+<img width="2777" height="1168" alt="BKD_10x_boost_analysis" src="https://github.com/user-attachments/assets/920facad-e7fd-41b9-85fc-088e7ae12000" />
+
+
 ****TECH UNLOCK TREE****
 
 <img width="1600" height="914" alt="bollinger_kerr_tech_tree_v13 png" src="https://github.com/user-attachments/assets/d21f2e9a-3f70-4c93-97a4-d1c9a7944318" />
