@@ -885,10 +885,10 @@ This work is open for research and non-commercial development. Attribution requi
 ### Citation
 
 ```bibtex
-@software{bollinger2024bkd,
+@software{bollinger2025bkd,
   author = {Bollinger, John (AlbusLux)},
   title = {Bollinger-Kerr Drive: Metric-Decoupled Propulsion Framework},
-  year = {2024},
+  year = {2025},
   url = {https://github.com/Albuslux1/Bollinger-Kerr-Drive},
   note = {Based on Grand Unified Theory of Coherence}
 }
@@ -897,8 +897,8 @@ This work is open for research and non-commercial development. Attribution requi
 ### Related Publications
 
 - **Grand Unified Theory of Coherence** (2024) - [The Experiment](https://thexperiment.tiiny.site)
-- **AGI Dancer Protocol** (2024) - [GitHub](https://github.com/Albuslux1/AGI-Protocol-v1.0)
-- **RAPL Nuclear Cycle** (2024) - [GitHub](https://github.com/Albuslux1/RAPL-Nuclear-Nutrient-Cycle)
+- **AGI Dancer Protocol** (2025) - [GitHub](https://github.com/Albuslux1/AGI-Protocol-v1.0)
+- **RAPL Nuclear Cycle** (2025) - [GitHub](https://github.com/Albuslux1/RAPL-Nuclear-Nutrient-Cycle)
 
 ---
 
@@ -928,6 +928,6 @@ This framework builds on:
 
 ---
 
-*Last Updated: December 2024*  
+*Last Updated: December 2025*  
 *Clones: 530+ | Forks: 0 | Watching: Growing*  
 *"We do not seek to break the speed of light; we seek to decouple the traveler from the drag of spacetime."*
