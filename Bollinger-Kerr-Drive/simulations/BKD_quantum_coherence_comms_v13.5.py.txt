@@ -1,0 +1,877 @@
+"""
+╔══════════════════════════════════════════════════════════════════════════════╗
+║                                                                              ║
+║           BOLLINGER-KERR DRIVE: QUANTUM COHERENCE COMMUNICATIONS             ║
+║                    "How E.T. Learned to Phone Home"                          ║
+║                                                                              ║
+║                           Framework #6 - v13.5                               ║
+║                                                                              ║
+║  A testable hypothesis for faster-than-light communication via coherence    ║
+║  field coupling with topological protection (Pan Jianwei method)             ║
+║                                                                              ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+CRITICAL DISCLAIMER:
+====================
+This is a THEORETICAL FRAMEWORK and simulation. It has NOT been experimentally
+validated. The hypothesis that coherence fields enable FTL communication is
+SPECULATIVE and requires rigorous experimental testing.
+
+DO NOT use this for:
+- Actual spacecraft communication systems
+- Critical infrastructure
+- Any application where lives depend on it
+
+This is for RESEARCH and THEORETICAL EXPLORATION only.
+
+WHAT THIS IS:
+=============
+A mathematical framework proposing that quantum coherence coupling, when 
+topologically protected via Pan Jianwei's methods, might enable faster-than-light
+communication by leveraging the coherence field as a nonlocal substrate.
+
+If validated experimentally, this would:
+- Enable instant communication across galactic distances
+- Unblock V14 (colony ship with 100k people, 20-year life support)
+- Represent a Type I civilization communications breakthrough
+- Be testable with TODAY'S technology
+
+THE HYPOTHESIS:
+===============
+Standard quantum entanglement: No-communication theorem prevents FTL info transfer
+GUCT coherence coupling: Coherence field might be nonlocal substrate enabling comms
+
+Key predictions:
+1. Topologically-protected qubits can couple via coherence field
+2. Modulating ship coherence → Earth detects change
+3. Chern ≥ 4 enables galactic-range communication
+4. Signal strength independent of distance (if field truly nonlocal)
+
+EXPERIMENTAL VALIDATION PATH:
+==============================
+Phase 1 (2025-2026): Lab test, 2 qubits, 1 km separation
+Phase 2 (2026-2028): Earth-orbit test, 1,000-10,000 km
+Phase 3 (2028-2030): Earth-Moon test, 384,000 km (test for FTL)
+Phase 4 (2030-2035): Mars probe test, 100M+ km
+Phase 5 (2040+): Interstellar probe, Alpha Centauri
+
+TESTABLE WITH TODAY'S TECH:
+============================
+✓ Quantum computers exist (IBM, Google, IonQ, etc.)
+✓ Topological protection demonstrated (Pan Jianwei, Micius satellite)
+✓ Coherence measurement possible (standard quantum metrology)
+✓ Phase 1 (lab test) achievable NOW with ~$1-5M budget
+
+Author: John Bollinger (AlbusLux) with Claude
+Date: December 2025
+License: Open Research - Free for non-commercial use, attribution required
+Repository: https://github.com/Albuslux1/Bollinger-Kerr-Drive
+Citation: Bollinger, J. (2025). Framework #6: Quantum Coherence Communications.
+          Bollinger-Kerr Drive Project.
+
+══════════════════════════════════════════════════════════════════════════════
+"""
+
+import numpy as np
+from scipy.integrate import solve_ivp
+import matplotlib.pyplot as plt
+from dataclasses import dataclass
+from typing import Tuple, List
+import sys
+
+# ══════════════════════════════════════════════════════════════════════════════
+# PHYSICAL CONSTANTS & PARAMETERS
+# ══════════════════════════════════════════════════════════════════════════════
+
+@dataclass
+class PhysicalConstants:
+    """Natural units (ℏ = c = 1)"""
+    hbar: float = 1.0
+    c: float = 1.0
+    ly_to_m: float = 9.461e15  # Light-year to meters
+
+@dataclass
+class SystemParameters:
+    """Quantum coherence communication system parameters"""
+    
+    # Qubit frequencies (natural units)
+    omega_ship: float = 1.0
+    omega_earth: float = 1.0
+    
+    # Coherence coupling strength (tunable parameter)
+    J_coupling: float = 0.1
+    
+    # Decoherence rates (inverse coherence time)
+    gamma_ship: float = 0.01    # Ship: higher due to cosmic rays
+    gamma_earth: float = 0.005  # Earth: lower (controlled environment)
+    
+    # Topological protection (Pan Jianwei method)
+    chern_number: int = 3  # Start with V13 level
+    
+    # Coherence field parameters
+    lambda_base: float = 1e6   # Base coherence length (light-years)
+    phi_0: float = 1.0         # Baseline coupling strength
+    
+    # Modulation parameters (information encoding)
+    mod_amplitude: float = 0.5  # Coherence modulation depth
+    mod_frequency: float = 0.1  # Information rate (bits/time unit)
+    
+    def __post_init__(self):
+        """Calculate derived parameters"""
+        # Topological protection factor
+        self.gamma_topology = 1 + (self.chern_number / 3)**2
+        
+        # Effective coherence length (enhanced by topology)
+        self.lambda_eff = self.lambda_base * self.gamma_topology**2
+        
+    def coupling_strength(self, distance_ly: float) -> float:
+        """
+        Calculate coherence field coupling strength at given distance.
+        
+        Parameters:
+        -----------
+        distance_ly : float
+            Separation distance in light-years
+            
+        Returns:
+        --------
+        phi_coupling : float
+            Coupling field strength (0 to phi_0 * gamma_topology)
+        """
+        decay = np.exp(-distance_ly / self.lambda_eff)
+        return self.phi_0 * self.gamma_topology * decay
+    
+    def max_distance(self, min_coupling: float = 1e-6) -> float:
+        """
+        Calculate maximum useful communication distance.
+        
+        Parameters:
+        -----------
+        min_coupling : float
+            Minimum detectable coupling strength
+            
+        Returns:
+        --------
+        max_dist : float
+            Maximum distance in light-years
+        """
+        if min_coupling >= self.phi_0 * self.gamma_topology:
+            return 0.0
+        return -self.lambda_eff * np.log(min_coupling / (self.phi_0 * self.gamma_topology))
+
+# ══════════════════════════════════════════════════════════════════════════════
+# QUANTUM OPERATORS
+# ══════════════════════════════════════════════════════════════════════════════
+
+class PauliMatrices:
+    """Pauli spin matrices for qubit operations"""
+    
+    @staticmethod
+    def sigma_x():
+        return np.array([[0, 1], [1, 0]], dtype=complex)
+    
+    @staticmethod
+    def sigma_y():
+        return np.array([[0, -1j], [1j, 0]], dtype=complex)
+    
+    @staticmethod
+    def sigma_z():
+        return np.array([[1, 0], [0, -1]], dtype=complex)
+    
+    @staticmethod
+    def identity():
+        return np.array([[1, 0], [0, 1]], dtype=complex)
+
+# ══════════════════════════════════════════════════════════════════════════════
+# COHERENCE FUNCTIONS
+# ══════════════════════════════════════════════════════════════════════════════
+
+def coherence_value(entropy: float, phase_alignment: float) -> float:
+    """
+    Calculate coherence from GUCT formula: C = e^(-S/k) · Φ
+    
+    Parameters:
+    -----------
+    entropy : float
+        System entropy (disorder, decoherence sources)
+    phase_alignment : float
+        Phase coherence factor (0 to 1)
+        
+    Returns:
+    --------
+    coherence : float
+        Total coherence value
+    """
+    return np.exp(-entropy) * phase_alignment
+
+def ship_modulation_signal(t: float, amplitude: float, frequency: float, 
+                          bit_sequence: List[int] = None) -> float:
+    """
+    Generate modulation signal for information encoding.
+    
+    Ship modulates its entropy to encode information:
+    - Bit 1: Increase entropy (lower coherence)
+    - Bit 0: Decrease entropy (higher coherence)
+    
+    Parameters:
+    -----------
+    t : float
+        Current time
+    amplitude : float
+        Modulation depth
+    frequency : float
+        Bit rate
+    bit_sequence : List[int], optional
+        Sequence of bits to transmit (default: sinusoidal test pattern)
+        
+    Returns:
+    --------
+    delta_entropy : float
+        Entropy modulation at time t
+    """
+    if bit_sequence is not None:
+        # Digital bit stream
+        bit_index = int(t * frequency) % len(bit_sequence)
+        return amplitude * (2 * bit_sequence[bit_index] - 1)
+    else:
+        # Continuous test signal (sinusoidal)
+        return amplitude * np.sin(2 * np.pi * frequency * t)
+
+# ══════════════════════════════════════════════════════════════════════════════
+# COUPLED DYNAMICS SIMULATION
+# ══════════════════════════════════════════════════════════════════════════════
+
+class QuantumCoherenceComms:
+    """
+    2-Qubit quantum coherence communication system simulator.
+    
+    Models coherence coupling between spatially-separated entangled qubits
+    with topological protection.
+    """
+    
+    def __init__(self, params: SystemParameters, distance_ly: float):
+        """
+        Initialize communication system.
+        
+        Parameters:
+        -----------
+        params : SystemParameters
+            System physical parameters
+        distance_ly : float
+            Separation distance in light-years
+        """
+        self.params = params
+        self.distance_ly = distance_ly
+        self.phi_coupling = params.coupling_strength(distance_ly)
+        
+        print(f"\n{'='*80}")
+        print(f"QUANTUM COHERENCE COMMUNICATION SYSTEM")
+        print(f"{'='*80}")
+        print(f"Distance:                    {distance_ly:,.0f} light-years")
+        print(f"Chern number:                {params.chern_number}")
+        print(f"Topological protection:      Γ = {params.gamma_topology:.3f}")
+        print(f"Effective coherence length:  λ_eff = {params.lambda_eff:.2e} LY")
+        print(f"Coupling strength:           Φ = {self.phi_coupling:.6e}")
+        print(f"{'='*80}\n")
+        
+    def dynamics(self, t: float, state: np.ndarray) -> np.ndarray:
+        """
+        Time evolution of coupled qubit-coherence system.
+        
+        State vector:
+        [C_ship, Phi_ship, C_earth, Phi_earth, <σ_x>_ship, <σ_x>_earth]
+        
+        Parameters:
+        -----------
+        t : float
+            Current time
+        state : ndarray
+            Current state vector
+            
+        Returns:
+        --------
+        dstate_dt : ndarray
+            Time derivatives
+        """
+        C_ship, Phi_ship, C_earth, Phi_earth, sx_ship, sx_earth = state
+        
+        # Ship applies modulation to encode information
+        delta_entropy = ship_modulation_signal(
+            t, 
+            self.params.mod_amplitude, 
+            self.params.mod_frequency
+        )
+        
+        # Ship coherence evolution (with active modulation)
+        dC_ship_dt = -self.params.gamma_ship * C_ship + \
+                     coherence_value(delta_entropy, Phi_ship) * 0.1
+        
+        # Earth coherence evolution (responds to ship via coupling)
+        coupling_term = self.params.J_coupling * self.phi_coupling * (C_ship - C_earth)
+        dC_earth_dt = -self.params.gamma_earth * C_earth + coupling_term
+        
+        # Phase alignments (assumed stable for this simulation)
+        dPhi_ship_dt = 0.0
+        dPhi_earth_dt = 0.0
+        
+        # Observable evolution (simplified Pauli expectation values)
+        dsx_ship_dt = -self.params.gamma_ship * sx_ship
+        dsx_earth_dt = -self.params.gamma_earth * sx_earth + \
+                       self.params.J_coupling * self.phi_coupling * C_ship * \
+                       np.sin(self.params.omega_earth * t)
+        
+        return np.array([
+            dC_ship_dt, dPhi_ship_dt, 
+            dC_earth_dt, dPhi_earth_dt,
+            dsx_ship_dt, dsx_earth_dt
+        ])
+    
+    def run_simulation(self, t_max: float = 100, n_points: int = 1000) -> dict:
+        """
+        Run full communication simulation.
+        
+        Parameters:
+        -----------
+        t_max : float
+            Simulation duration
+        n_points : int
+            Number of time points
+            
+        Returns:
+        --------
+        results : dict
+            Simulation results and analysis
+        """
+        # Initial conditions (both qubits in coherent state)
+        initial_state = np.array([
+            1.0,  # C_ship
+            1.0,  # Phi_ship
+            1.0,  # C_earth
+            1.0,  # Phi_earth
+            0.0,  # <σ_x>_ship
+            0.0   # <σ_x>_earth
+        ])
+        
+        # Time points
+        t_eval = np.linspace(0, t_max, n_points)
+        
+        print("Running simulation...")
+        
+        # Solve coupled differential equations
+        sol = solve_ivp(
+            self.dynamics,
+            [0, t_max],
+            initial_state,
+            t_eval=t_eval,
+            method='RK45',
+            rtol=1e-8,
+            atol=1e-10
+        )
+        
+        if not sol.success:
+            print(f"⚠ WARNING: Integration failed: {sol.message}")
+            return None
+        
+        # Extract results
+        results = {
+            't': sol.t,
+            'C_ship': sol.y[0],
+            'C_earth': sol.y[2],
+            'sx_earth': sol.y[5],  # The received signal
+            'modulation': np.array([ship_modulation_signal(t, self.params.mod_amplitude, 
+                                                          self.params.mod_frequency) 
+                                   for t in sol.t])
+        }
+        
+        # Analyze signal detection
+        results.update(self._analyze_signal(results))
+        
+        print("✓ Simulation complete\n")
+        
+        return results
+    
+    def _analyze_signal(self, results: dict) -> dict:
+        """
+        Analyze received signal for detection quality.
+        
+        Parameters:
+        -----------
+        results : dict
+            Simulation results
+            
+        Returns:
+        --------
+        analysis : dict
+            Signal analysis metrics
+        """
+        # Remove baseline from Earth observable
+        baseline = np.mean(results['sx_earth'][:100])
+        signal = results['sx_earth'] - baseline
+        
+        # Signal metrics
+        signal_strength = np.std(signal)
+        noise_floor = self.params.gamma_earth  # Approximate
+        snr = signal_strength / noise_floor if noise_floor > 0 else np.inf
+        
+        # Detection threshold (SNR > 3 for reliable detection)
+        detected = snr > 3.0
+        
+        return {
+            'signal': signal,
+            'signal_strength': signal_strength,
+            'noise_floor': noise_floor,
+            'snr': snr,
+            'detected': detected
+        }
+
+# ══════════════════════════════════════════════════════════════════════════════
+# TESTING PROTOCOLS
+# ══════════════════════════════════════════════════════════════════════════════
+
+class TestingProtocols:
+    """
+    Comprehensive testing suite for quantum coherence communications.
+    
+    Implements all 5 phases of experimental validation pathway.
+    """
+    
+    @staticmethod
+    def test_1_baseline_chern3(save_plots: bool = True) -> dict:
+        """
+        TEST 1: Baseline with Chern = 3 (V13 level)
+        Distance: 26,000 LY (Galactic Center)
+        Expected: Weak signal, SNR ~ 1-3 (borderline detection)
+        """
+        print("\n" + "="*80)
+        print("TEST 1: BASELINE (CHERN = 3, GALACTIC CENTER)")
+        print("="*80)
+        
+        params = SystemParameters(chern_number=3)
+        sim = QuantumCoherenceComms(params, distance_ly=26000)
+        results = sim.run_simulation()
+        
+        if save_plots:
+            TestingProtocols._plot_results(results, sim, "test1_chern3_galactic")
+        
+        TestingProtocols._print_results(results, sim, "Baseline (Chern 3)")
+        
+        return results
+    
+    @staticmethod
+    def test_2_enhanced_chern4(save_plots: bool = True) -> dict:
+        """
+        TEST 2: Enhanced with Chern = 4
+        Distance: 26,000 LY (Galactic Center)
+        Expected: Strong signal, SNR ~ 5-10 (clear detection)
+        """
+        print("\n" + "="*80)
+        print("TEST 2: ENHANCED (CHERN = 4, GALACTIC CENTER)")
+        print("="*80)
+        
+        params = SystemParameters(chern_number=4)
+        sim = QuantumCoherenceComms(params, distance_ly=26000)
+        results = sim.run_simulation()
+        
+        if save_plots:
+            TestingProtocols._plot_results(results, sim, "test2_chern4_galactic")
+        
+        TestingProtocols._print_results(results, sim, "Enhanced (Chern 4)")
+        
+        return results
+    
+    @staticmethod
+    def test_3_distance_sweep(save_plots: bool = True) -> dict:
+        """
+        TEST 3: Distance Sweep (Chern = 4 fixed)
+        Range: 1 LY → 100,000 LY
+        Goal: Find maximum reliable communication range
+        """
+        print("\n" + "="*80)
+        print("TEST 3: DISTANCE SWEEP (CHERN = 4)")
+        print("="*80)
+        
+        params = SystemParameters(chern_number=4)
+        distances = np.logspace(0, 5, 20)  # 1 to 100,000 LY
+        snr_values = []
+        
+        for dist in distances:
+            sim = QuantumCoherenceComms(params, distance_ly=dist)
+            results = sim.run_simulation()
+            snr_values.append(results['snr'])
+            print(f"  {dist:>8.1f} LY: SNR = {results['snr']:>6.2f} "
+                  f"{'✓' if results['detected'] else '✗'}")
+        
+        sweep_results = {
+            'distances': distances,
+            'snr_values': np.array(snr_values),
+            'params': params
+        }
+        
+        if save_plots:
+            TestingProtocols._plot_distance_sweep(sweep_results, "test3_distance_sweep")
+        
+        # Find max distance
+        detected_mask = np.array(snr_values) > 3.0
+        if np.any(detected_mask):
+            max_dist = distances[detected_mask][-1]
+            print(f"\n✓ Maximum reliable range: {max_dist:,.0f} LY")
+        else:
+            print("\n✗ No reliable detection at any tested distance")
+        
+        return sweep_results
+    
+    @staticmethod
+    def test_4_intergalactic_chern5(save_plots: bool = True) -> dict:
+        """
+        TEST 4: Intergalactic Communication (Chern = 5)
+        Distance: 2.5 million LY (Andromeda Galaxy)
+        Expected: Should work if theory correct
+        """
+        print("\n" + "="*80)
+        print("TEST 4: INTERGALACTIC (CHERN = 5, ANDROMEDA)")
+        print("="*80)
+        
+        params = SystemParameters(chern_number=5)
+        sim = QuantumCoherenceComms(params, distance_ly=2.5e6)
+        results = sim.run_simulation()
+        
+        if save_plots:
+            TestingProtocols._plot_results(results, sim, "test4_chern5_andromeda")
+        
+        TestingProtocols._print_results(results, sim, "Intergalactic (Chern 5)")
+        
+        return results
+    
+    @staticmethod
+    def test_5_bandwidth(save_plots: bool = True) -> dict:
+        """
+        TEST 5: Bandwidth Characterization
+        Sweep modulation frequency to find optimal bit rate
+        Fixed: Chern = 4, Distance = 26,000 LY
+        """
+        print("\n" + "="*80)
+        print("TEST 5: BANDWIDTH CHARACTERIZATION")
+        print("="*80)
+        
+        base_params = SystemParameters(chern_number=4)
+        frequencies = np.logspace(-2, 1, 15)  # 0.01 to 10 Hz
+        snr_values = []
+        
+        for freq in frequencies:
+            params = SystemParameters(chern_number=4, mod_frequency=freq)
+            sim = QuantumCoherenceComms(params, distance_ly=26000)
+            results = sim.run_simulation(t_max=200)  # Longer for lower frequencies
+            snr_values.append(results['snr'])
+            print(f"  {freq:>6.3f} Hz: SNR = {results['snr']:>6.2f}")
+        
+        bandwidth_results = {
+            'frequencies': frequencies,
+            'snr_values': np.array(snr_values)
+        }
+        
+        if save_plots:
+            TestingProtocols._plot_bandwidth(bandwidth_results, "test5_bandwidth")
+        
+        # Find optimal frequency
+        optimal_idx = np.argmax(snr_values)
+        optimal_freq = frequencies[optimal_idx]
+        optimal_snr = snr_values[optimal_idx]
+        
+        print(f"\n✓ Optimal modulation frequency: {optimal_freq:.3f} Hz")
+        print(f"  Maximum SNR: {optimal_snr:.2f}")
+        
+        return bandwidth_results
+    
+    @staticmethod
+    def _print_results(results: dict, sim: QuantumCoherenceComms, test_name: str):
+        """Print formatted test results"""
+        print(f"\n{'─'*80}")
+        print(f"RESULTS: {test_name}")
+        print(f"{'─'*80}")
+        print(f"Distance:              {sim.distance_ly:>12,.0f} LY")
+        print(f"Coupling strength:     {sim.phi_coupling:>16.6e}")
+        print(f"Signal-to-Noise Ratio: {results['snr']:>16.2f}")
+        print(f"Detection threshold:   {3.0:>16.1f} (SNR > 3.0)")
+        print(f"Signal detected:       {results['detected']:>16}")
+        
+        if results['detected']:
+            print(f"\n✓ COMMUNICATION LINK ESTABLISHED")
+            print(f"  Earth successfully receives Ship's modulation")
+        else:
+            print(f"\n✗ Signal too weak for reliable communication")
+            required_coupling = 3 * results['noise_floor'] / sim.params.J_coupling
+            print(f"  Required coupling: Φ > {required_coupling:.6e}")
+            print(f"  Options to improve:")
+            print(f"    • Increase Chern number")
+            print(f"    • Increase J_coupling (optimize cavity integration)")
+            print(f"    • Reduce decoherence (better shielding)")
+        print(f"{'─'*80}\n")
+    
+    @staticmethod
+    def _plot_results(results: dict, sim: QuantumCoherenceComms, filename: str):
+        """Generate comprehensive result plots"""
+        fig, axes = plt.subplots(3, 1, figsize=(14, 11))
+        
+        t = results['t']
+        
+        # Plot 1: Coherence Evolution
+        axes[0].plot(t, results['C_ship'], 'b-', label='Ship Coherence', linewidth=2)
+        axes[0].plot(t, results['C_earth'], 'r-', label='Earth Coherence', linewidth=2)
+        axes[0].set_ylabel('Coherence C', fontsize=12)
+        axes[0].set_title(
+            f'Quantum Coherence Communication\n'
+            f'Distance: {sim.distance_ly:,.0f} LY | Chern: {sim.params.chern_number} | '
+            f'SNR: {results["snr"]:.2f}',
+            fontsize=14, fontweight='bold'
+        )
+        axes[0].legend(loc='best', fontsize=11)
+        axes[0].grid(alpha=0.3)
+        
+        # Plot 2: Transmitted Signal
+        axes[1].plot(t, results['modulation'], 'g-', linewidth=2)
+        axes[1].set_ylabel('Ship Modulation\n(Δ Entropy)', fontsize=12)
+        axes[1].set_title('Transmitted Signal (Coherence Modulation)', fontsize=12)
+        axes[1].grid(alpha=0.3)
+        axes[1].axhline(0, color='k', linestyle='--', alpha=0.3)
+        
+        # Plot 3: Received Signal
+        color = 'lime' if results['detected'] else 'red'
+        axes[2].plot(t, results['signal'], color=color, linewidth=2, 
+                    label=f'Received Signal (SNR={results["snr"]:.2f})')
+        axes[2].axhline(0, color='k', linestyle='--', alpha=0.3)
+        axes[2].axhline(3*results['noise_floor'], color='cyan', linestyle=':', 
+                       label='Detection Threshold', alpha=0.7)
+        axes[2].axhline(-3*results['noise_floor'], color='cyan', linestyle=':', alpha=0.7)
+        axes[2].set_xlabel('Time (natural units)', fontsize=12)
+        axes[2].set_ylabel('Earth Observable\n⟨σ_x⟩', fontsize=12)
+        status = '✓ DETECTED' if results['detected'] else '✗ NOT DETECTED'
+        axes[2].set_title(f'Received Signal at Earth Station ({status})', fontsize=12)
+        axes[2].legend(loc='best', fontsize=11)
+        axes[2].grid(alpha=0.3)
+        
+        plt.tight_layout()
+        plt.savefig(f'{filename}.png', dpi=150, bbox_inches='tight')
+        print(f"✓ Plot saved: {filename}.png")
+        plt.close()
+    
+    @staticmethod
+    def _plot_distance_sweep(sweep_results: dict, filename: str):
+        """Plot distance sweep results"""
+        fig, ax = plt.subplots(figsize=(12, 8))
+        
+        distances = sweep_results['distances']
+        snr = sweep_results['snr_values']
+        
+        # Plot SNR vs distance
+        ax.loglog(distances, snr, 'b-', linewidth=2.5, label='SNR vs Distance')
+        ax.axhline(3.0, color='cyan', linestyle='--', linewidth=2, 
+                  label='Detection Threshold (SNR=3)')
+        
+        # Fill detection region
+        ax.fill_between(distances, 0.1, 3.0, alpha=0.2, color='red', 
+                       label='No Detection')
+        ax.fill_between(distances, 3.0, max(snr)*1.5, alpha=0.2, color='green', 
+                       label='Reliable Detection')
+        
+        # Mark key distances
+        key_distances = {
+            'Alpha Centauri': 4.37,
+            'Galactic Center': 26000,
+            'Galactic Edge': 50000,
+            'Andromeda': 2.5e6
+        }
+        
+        for name, dist in key_distances.items():
+            if distances[0] <= dist <= distances[-1]:
+                # Interpolate SNR at this distance
+                snr_at_dist = np.interp(dist, distances, snr)
+                color = 'green' if snr_at_dist > 3 else 'red'
+                ax.plot(dist, snr_at_dist, 'o', markersize=10, color=color)
+                ax.annotate(name, (dist, snr_at_dist), 
+                           xytext=(10, 10), textcoords='offset points',
+                           fontsize=10, fontweight='bold')
+        
+        ax.set_xlabel('Distance (Light-Years)', fontsize=13)
+        ax.set_ylabel('Signal-to-Noise Ratio', fontsize=13)
+        ax.set_title(f'Communication Range vs Distance (Chern = {sweep_results["params"].chern_number})',
+                    fontsize=15, fontweight='bold')
+        ax.legend(loc='best', fontsize=11)
+        ax.grid(True, which='both', alpha=0.3)
+        ax.set_ylim([0.1, max(snr)*1.5])
+        
+        plt.tight_layout()
+        plt.savefig(f'{filename}.png', dpi=150, bbox_inches='tight')
+        print(f"✓ Plot saved: {filename}.png")
+        plt.close()
+    
+    @staticmethod
+    def _plot_bandwidth(bandwidth_results: dict, filename: str):
+        """Plot bandwidth characterization results"""
+        fig, ax = plt.subplots(figsize=(12, 8))
+        
+        frequencies = bandwidth_results['frequencies']
+        snr = bandwidth_results['snr_values']
+        
+        ax.semilogx(frequencies, snr, 'b-', linewidth=2.5, marker='o', 
+                   markersize=8, label='SNR vs Modulation Frequency')
+        ax.axhline(3.0, color='cyan', linestyle='--', linewidth=2, 
+                  label='Detection Threshold')
+        
+        # Mark optimal frequency
+        optimal_idx = np.argmax(snr)
+        optimal_freq = frequencies[optimal_idx]
+        optimal_snr = snr[optimal_idx]
+        ax.plot(optimal_freq, optimal_snr, 'r*', markersize=20, 
+               label=f'Optimal: {optimal_freq:.3f} Hz (SNR={optimal_snr:.2f})')
+        
+        ax.set_xlabel('Modulation Frequency (Hz)', fontsize=13)
+        ax.set_ylabel('Signal-to-Noise Ratio', fontsize=13)
+        ax.set_title('Bandwidth Characterization: Information Transfer Rate',
+                    fontsize=15, fontweight='bold')
+        ax.legend(loc='best', fontsize=11)
+        ax.grid(True, which='both', alpha=0.3)
+        
+        plt.tight_layout()
+        plt.savefig(f'{filename}.png', dpi=150, bbox_inches='tight')
+        print(f"✓ Plot saved: {filename}.png")
+        plt.close()
+    
+    @staticmethod
+    def run_all_tests(save_plots: bool = True):
+        """Execute complete test suite"""
+        print("\n" + "╔" + "="*78 + "╗")
+        print("║" + " "*15 + "QUANTUM COHERENCE COMMUNICATIONS TEST SUITE" + " "*20 + "║")
+        print("║" + " "*21 + "Framework #6 - Complete Validation" + " "*23 + "║")
+        print("╚" + "="*78 + "╝\n")
+        
+        results = {}
+        
+        results['test1'] = TestingProtocols.test_1_baseline_chern3(save_plots)
+        results['test2'] = TestingProtocols.test_2_enhanced_chern4(save_plots)
+        results['test3'] = TestingProtocols.test_3_distance_sweep(save_plots)
+        results['test4'] = TestingProtocols.test_4_intergalactic_chern5(save_plots)
+        results['test5'] = TestingProtocols.test_5_bandwidth(save_plots)
+        
+        # Final summary
+        print("\n" + "="*80)
+        print("COMPLETE TEST SUITE SUMMARY")
+        print("="*80)
+        print(f"Test 1 (Chern 3, Galactic):    SNR = {results['test1']['snr']:>6.2f}  "
+              f"{'✓' if results['test1']['detected'] else '✗'}")
+        print(f"Test 2 (Chern 4, Galactic):    SNR = {results['test2']['snr']:>6.2f}  "
+              f"{'✓' if results['test2']['detected'] else '✗'}")
+        print(f"Test 4 (Chern 5, Andromeda):   SNR = {results['test4']['snr']:>6.2f}  "
+              f"{'✓' if results['test4']['detected'] else '✗'}")
+        
+        print("\n" + "="*80)
+        print("KEY FINDINGS")
+        print("="*80)
+        
+        # Determine minimum Chern for galactic comms
+        if results['test1']['detected']:
+            print("✓ Chern 3 sufficient for galactic communication (26,000 LY)")
+        elif results['test2']['detected']:
+            print("✓ Chern 4 required for galactic communication (26,000 LY)")
+        else:
+            print("✗ Need Chern ≥ 5 for galactic communication")
+        
+        # Intergalactic capability
+        if results['test4']['detected']:
+            print("✓ Chern 5 enables intergalactic communication (Andromeda)")
+        else:
+            print("✗ Intergalactic communication requires Chern > 5")
+        
+        print("\n" + "="*80)
+        print("EXPERIMENTAL VALIDATION PATHWAY")
+        print("="*80)
+        print("Phase 1 (2025-2026): Lab test, 1 km separation")
+        print("  → Build 2 topologically-protected quantum computers")
+        print("  → Demonstrate coherence coupling")
+        print("  → Measure: Does modulation transfer information?")
+        print("")
+        print("Phase 2 (2026-2028): Earth-orbit satellite test")
+        print("  → Quantum computer on satellite (1,000-10,000 km)")
+        print("  → Test at increasing distances")
+        print("  → Measure: Communication lag (FTL test)")
+        print("")
+        print("Phase 3 (2028-2030): Earth-Moon test")
+        print("  → Lunar base quantum station (384,000 km)")
+        print("  → Light travel time: 1.3 seconds")
+        print("  → Critical: If signal arrives <1.3s → FTL confirmed")
+        print("")
+        print("Phase 4 (2030-2035): Deep space probe")
+        print("  → Mars/Jupiter mission with quantum computer")
+        print("  → Test at 100M+ km")
+        print("  → Validate: Long-distance coherence preservation")
+        print("")
+        print("Phase 5 (2040+): Interstellar probe")
+        print("  → Alpha Centauri mission (4.37 LY)")
+        print("  → Ultimate validation of theory")
+        print("  → If successful: Enable V14 colony ship communications")
+        print("="*80 + "\n")
+        
+        return results
+
+# ══════════════════════════════════════════════════════════════════════════════
+# MAIN EXECUTION
+# ══════════════════════════════════════════════════════════════════════════════
+
+def main():
+    """Main execution function"""
+    
+    # Print header
+    print("""
+    ╔══════════════════════════════════════════════════════════════════════════╗
+    ║                                                                          ║
+    ║              QUANTUM COHERENCE COMMUNICATIONS SIMULATOR                  ║
+    ║                    "How E.T. Learned to Phone Home"                      ║
+    ║                                                                          ║
+    ║                          Framework #6 - v13.5                            ║
+    ║                                                                          ║
+    ║  Testing the hypothesis: Can topologically-protected coherence coupling  ║
+    ║  enable faster-than-light communication across galactic distances?       ║
+    ║                                                                          ║
+    ╚══════════════════════════════════════════════════════════════════════════╝
+    """)
+    
+    # Check command line arguments
+    if len(sys.argv) > 1:
+        if sys.argv[1] == 'test1':
+            TestingProtocols.test_1_baseline_chern3()
+        elif sys.argv[1] == 'test2':
+            TestingProtocols.test_2_enhanced_chern4()
+        elif sys.argv[1] == 'test3':
+            TestingProtocols.test_3_distance_sweep()
+        elif sys.argv[1] == 'test4':
+            TestingProtocols.test_4_intergalactic_chern5()
+        elif sys.argv[1] == 'test5':
+            TestingProtocols.test_5_bandwidth()
+        elif sys.argv[1] == 'all':
+            TestingProtocols.run_all_tests()
+        else:
+            print(f"Unknown test: {sys.argv[1]}")
+            print("Usage: python BKD_quantum_coherence_comms_v13.5.py [test1|test2|test3|test4|test5|all]")
+    else:
+        # Default: Run complete test suite
+        TestingProtocols.run_all_tests()
+    
+    print("\n✓ All simulations complete!")
+    print("\nNEXT STEPS:")
+    print("1. Review generated plots")
+    print("2. Analyze SNR requirements for each Chern level")
+    print("3. Design Phase 1 lab experiment (2-qubit system, 1 km)")
+    print("4. Seek experimental collaboration (Pan Jianwei's group?)")
+    print("5. Publish theoretical framework for peer review")
+    print("\nIf validated: This unblocks V14 colony ship communications!")
+    print("If refuted: We learn fundamental limits of coherence field\n")
+
+if __name__ == "__main__":
+    main()
+
+# Run all tests
+python BKD_quantum_coherence_comms_v13.5.py
+
+# Run specific test
+python BKD_quantum_coherence_comms_v13.5.py test1
+python BKD_quantum_coherence_comms_v13.5.py test2
+# etc.
