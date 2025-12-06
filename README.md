@@ -352,7 +352,8 @@ The value of **10.3 MHz** is currently a heuristic variable derived from intuiti
 
 ### TECH UNLOCK TREE
 
-<img width="2445" height="1594" alt="bkd_trl_v14_topological_lock" src="https://github.com/user-attachments/assets/c6204cda-b123-4bd5-9b8f-366d61a76b4f" />
+<img width="5358" height="3570" alt="bollinger_kerr_tech_tree_v13_5" src="https://github.com/user-attachments/assets/6191b272-12dd-4301-a3cf-a5209e2f5f02" />
+
 
 
 
