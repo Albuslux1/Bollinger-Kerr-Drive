@@ -7,7 +7,7 @@
 ![Clones](https://img.shields.io/badge/clones-530%2B-brightgreen)
 
 **Theoretical resonance-driven metric-decoupled propulsion in rotating black-hole spacetimes**
-
+   “This repository is an invitation: not to agree, but to be curious enough to walk through the mind of someone who refused to stop at ‘impossible.’
 ---
 
 ## 🚀 MAJOR BREAKTHROUGH: 10x Vortex Boost Path to FTL Threshold
